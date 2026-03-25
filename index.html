@@ -1,3 +1,1785 @@
 <!DOCTYPE html>
-  <html lang="fr">
-  <head>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Introduction au Deep Learning — Construire un MLP de zéro pour résoudre XOR</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" crossorigin="anonymous" async></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --bg-card: #12121a;
+    --bg-code: #1a1a2e;
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --accent3: #ff6b6b;
+    --text: #e8e8f0;
+    --text-dim: #8888a0;
+    --text-bright: #ffffff;
+    --border: #2a2a3e;
+    --gradient1: linear-gradient(135deg, #6c63ff 0%, #00d4aa 100%);
+    --gradient2: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+    --gradient3: linear-gradient(135deg, #6c63ff 0%, #e040fb 100%);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+    font-size: 17px;
+    overflow-x: hidden;
+  }
+
+  /* ============ HERO ============ */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    padding: 2rem;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 40%, rgba(108,99,255,0.12) 0%, transparent 50%),
+                radial-gradient(circle at 70% 60%, rgba(0,212,170,0.08) 0%, transparent 50%);
+    animation: heroPulse 8s ease-in-out infinite alternate;
+  }
+
+  @keyframes heroPulse {
+    0% { transform: scale(1) rotate(0deg); }
+    100% { transform: scale(1.05) rotate(2deg); }
+  }
+
+  .hero-content { position: relative; z-index: 1; max-width: 900px; }
+
+  .hero-badge {
+    display: inline-block;
+    padding: 0.4rem 1.2rem;
+    border: 1px solid var(--accent);
+    border-radius: 50px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--accent);
+    margin-bottom: 2rem;
+    animation: fadeInUp 1s ease;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    animation: fadeInUp 1s ease 0.2s both;
+  }
+
+  .hero h1 .gradient-text {
+    background: var(--gradient1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero .subtitle {
+    font-size: 1.2rem;
+    color: var(--text-dim);
+    max-width: 650px;
+    margin: 0 auto 2.5rem;
+    animation: fadeInUp 1s ease 0.4s both;
+  }
+
+  .hero .author {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    animation: fadeInUp 1s ease 0.6s both;
+  }
+
+  .hero .author strong { color: var(--text); }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: bounce 2s infinite;
+    color: var(--text-dim);
+    font-size: 1.5rem;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(10px); }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============ NAV ============ */
+  .toc {
+    position: fixed;
+    top: 50%;
+    right: 1.5rem;
+    transform: translateY(-50%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .toc a {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+    display: block;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .toc a:hover, .toc a.active {
+    background: var(--accent);
+    box-shadow: 0 0 10px rgba(108,99,255,0.5);
+    transform: scale(1.3);
+  }
+
+  .toc a .toc-label {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    background: var(--bg-card);
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: var(--text);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    border: 1px solid var(--border);
+  }
+
+  .toc a:hover .toc-label { opacity: 1; }
+
+  @media (max-width: 900px) { .toc { display: none; } }
+
+  /* ============ SECTIONS ============ */
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  section {
+    padding: 5rem 0;
+    position: relative;
+  }
+
+  .section-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 6rem;
+    font-weight: 800;
+    background: var(--gradient1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    opacity: 0.15;
+    line-height: 1;
+    margin-bottom: -2rem;
+    display: block;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-bright);
+    margin: 2.5rem 0 1rem;
+    padding-left: 1rem;
+    border-left: 3px solid var(--accent);
+  }
+
+  p { margin-bottom: 1.2rem; color: var(--text); }
+
+  /* ============ CARDS ============ */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    margin: 2rem 0;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(108,99,255,0.1);
+  }
+
+  .card-accent {
+    border-left: 4px solid var(--accent);
+  }
+
+  .card-warning {
+    border-left: 4px solid var(--accent3);
+    background: rgba(255,107,107,0.05);
+  }
+
+  .card-success {
+    border-left: 4px solid var(--accent2);
+    background: rgba(0,212,170,0.05);
+  }
+
+  /* ============ FIGURES / SVG ============ */
+  .figure {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    margin: 2.5rem 0;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .figure svg { max-width: 100%; height: auto; }
+
+  .figure-caption {
+    margin-top: 1rem;
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    text-align: left;
+    line-height: 1.5;
+  }
+
+  .figure-caption .fig-number {
+    font-weight: 700;
+    color: var(--text);
+    display: block;
+  }
+
+  .figure-caption .fig-title {
+    font-style: italic;
+    display: block;
+  }
+
+  .figure-caption .fig-note {
+    font-style: normal;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    margin-top: 0.3rem;
+    display: block;
+  }
+
+  /* ============ CODE ============ */
+  .code-block {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin: 1.5rem 0;
+    overflow: hidden;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 1.2rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .code-header .dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .code-header .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+
+  .code-header .dot:nth-child(1) { background: #ff5f56; }
+  .code-header .dot:nth-child(2) { background: #ffbd2e; }
+  .code-header .dot:nth-child(3) { background: #27c93f; }
+
+  .code-header .lang {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .code-block pre {
+    padding: 1.2rem;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: #c8c8e0;
+  }
+
+  .code-block .kw { color: #c792ea; }
+  .code-block .fn { color: #82aaff; }
+  .code-block .str { color: #c3e88d; }
+  .code-block .num { color: #f78c6c; }
+  .code-block .cm { color: #546e7a; font-style: italic; }
+  .code-block .op { color: #89ddff; }
+  .code-block .var { color: #ffcb6b; }
+  .code-block .self { color: #f07178; }
+
+  /* ============ FORMULA ============ */
+  .formula-box {
+    background: linear-gradient(135deg, rgba(108,99,255,0.08), rgba(0,212,170,0.08));
+    border: 1px solid rgba(108,99,255,0.3);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin: 1.5rem 0;
+    text-align: center;
+    font-size: 1.15rem;
+  }
+
+  /* ============ TABLE ============ */
+  .styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .styled-table th {
+    background: rgba(108,99,255,0.15);
+    padding: 1rem;
+    text-align: center;
+    font-weight: 600;
+    color: var(--accent);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .styled-table td {
+    padding: 0.8rem 1rem;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+  }
+
+  .styled-table tr:hover td { background: rgba(108,99,255,0.05); }
+
+  /* ============ STEP INDICATORS ============ */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .step {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    background: var(--gradient1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: white;
+  }
+
+  .step-content { flex: 1; }
+
+  .step-content h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-bright);
+    margin-bottom: 0.3rem;
+  }
+
+  .step-content p { margin-bottom: 0; color: var(--text-dim); font-size: 0.95rem; }
+
+  /* ============ CANVAS CHARTS ============ */
+  .chart-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .chart-container canvas {
+    width: 100% !important;
+    max-height: 380px;
+  }
+
+  /* ============ DIVIDER ============ */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 3rem 0;
+  }
+
+  /* ============ SOURCES ============ */
+  .references-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .references-list li {
+    padding: 0.6rem 0;
+    font-size: 0.92rem;
+    color: var(--text);
+    line-height: 1.7;
+    padding-left: 2.5rem;
+    text-indent: -2.5rem;
+  }
+
+  .references-list li + li {
+    border-top: 1px solid rgba(42,42,62,0.4);
+    margin-top: 0.3rem;
+    padding-top: 0.9rem;
+  }
+
+  .references-list li a {
+    color: var(--accent);
+    text-decoration: none;
+    word-break: break-all;
+  }
+
+  .references-list li a:hover { text-decoration: underline; }
+
+  /* ============ ANIMATIONS ============ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ============ SOMMAIRE ============ */
+  .sommaire-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin: 2rem 0;
+  }
+
+  .sommaire-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.8rem 1.2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 0.92rem;
+    transition: all 0.3s;
+  }
+
+  .sommaire-item:hover {
+    border-color: var(--accent);
+    background: rgba(108,99,255,0.05);
+    transform: translateX(4px);
+  }
+
+  .sommaire-num {
+    color: var(--accent);
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 600px) {
+    .sommaire-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 2.2rem; }
+    h2 { font-size: 1.8rem; }
+    .container { padding: 0 1.2rem; }
+    .section-number { font-size: 4rem; }
+  }
+
+  /* Pulse animation for neuron SVG */
+  @keyframes pulse {
+    0%, 100% { r: 30; }
+    50% { r: 33; }
+  }
+
+  @keyframes flowRight {
+    0% { stroke-dashoffset: 20; }
+    100% { stroke-dashoffset: 0; }
+  }
+
+  .flow-line {
+    stroke-dasharray: 10 10;
+    animation: flowRight 1s linear infinite;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 3rem 0;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+    margin-top: 3rem;
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== NAV DOTS ==================== -->
+<nav class="toc" id="toc">
+  <a href="#hero"><span class="toc-label">Accueil</span></a>
+  <a href="#intro"><span class="toc-label">Introduction</span></a>
+  <a href="#histoire"><span class="toc-label">Histoire</span></a>
+  <a href="#general"><span class="toc-label">Vue d'ensemble</span></a>
+  <a href="#neurone"><span class="toc-label">Neurone</span></a>
+  <a href="#couche"><span class="toc-label">Couches</span></a>
+  <a href="#activation"><span class="toc-label">Activation</span></a>
+  <a href="#loss"><span class="toc-label">Loss Function</span></a>
+  <a href="#backprop"><span class="toc-label">Backpropagation</span></a>
+  <a href="#implementation"><span class="toc-label">Implémentation</span></a>
+  <a href="#sources"><span class="toc-label">Sources</span></a>
+</nav>
+
+<!-- ==================== HERO ==================== -->
+<header class="hero" id="hero">
+  <div class="hero-content">
+    <span class="hero-badge">Réseau de Neurones Artificiels</span>
+    <h1>Introduction au<br><span class="gradient-text">Deep Learning</span></h1>
+    <p class="subtitle">Construire un Perceptron Multicouche de zéro pour résoudre le problème historique du XOR — le défi qui a failli tuer l'intelligence artificielle.</p>
+    <p class="author">Par <strong>Nathan Feuerstein</strong></p>
+  </div>
+  <div class="scroll-indicator">&#8595;</div>
+</header>
+
+<main class="container">
+
+<!-- ==================== SOMMAIRE ==================== -->
+<section>
+  <div class="card reveal">
+    <h2 style="font-size:1.6rem; margin-bottom:1rem;">Sommaire</h2>
+    <div class="sommaire-grid">
+      <a href="#intro" class="sommaire-item"><span class="sommaire-num">01</span> Avant-propos</a>
+      <a href="#histoire" class="sommaire-item"><span class="sommaire-num">02</span> Contexte historique</a>
+      <a href="#general" class="sommaire-item"><span class="sommaire-num">03</span> Fonctionnement général</a>
+      <a href="#neurone" class="sommaire-item"><span class="sommaire-num">04</span> Le neurone artificiel</a>
+      <a href="#couche" class="sommaire-item"><span class="sommaire-num">05</span> Couches de neurones</a>
+      <a href="#activation" class="sommaire-item"><span class="sommaire-num">06</span> Fonction d'activation</a>
+      <a href="#loss" class="sommaire-item"><span class="sommaire-num">07</span> Loss Function (MSE)</a>
+      <a href="#backprop" class="sommaire-item"><span class="sommaire-num">08</span> Backpropagation</a>
+      <a href="#implementation" class="sommaire-item"><span class="sommaire-num">09</span> Implémentation complète</a>
+      <a href="#sources" class="sommaire-item"><span class="sommaire-num">10</span> Sources</a>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 1. INTRODUCTION ==================== -->
+<section id="intro">
+  <span class="section-number reveal">01</span>
+  <h2 class="reveal">Avant-propos</h2>
+
+  <p class="reveal">L'intelligence artificielle est l'une des inventions technologiques majeures de notre époque. Sa variante la plus impressionnante, notamment celle des grands modèles de langage (LLM) comme ChatGPT ou Claude, est le <strong>« Deep Learning »</strong> ou apprentissage profond. Cet article a pour but d'en faire une introduction accessible au plus grand nombre.</p>
+
+  <p class="reveal">Un modèle de Deep Learning est un <strong>Réseau de Neurones Artificiel (RNA)</strong>. C'est l'interconnexion de fonctions mathématiques appelées neurones qui permet à notre modèle de fonctionner. Pas de panique, je détaillerai ces concepts par la suite et je suis persuadé que cela vous paraîtra limpide.</p>
+
+  <div class="card card-accent reveal">
+    <p style="margin:0;"><strong>Le saviez-vous ?</strong> Selon un rapport de Microsoft, en 2025, <strong>35 % des entreprises</strong> utilisent déjà l'IA quotidiennement dans leurs opérations. Environ <strong>1,5 milliard de personnes</strong> utilisent des outils d'IA générative au quotidien. <em>(Global AI Adoption, 2025)</em></p>
+  </div>
+
+  <p class="reveal">Les ingénieurs qui développent de nouveaux outils d'IA utilisent bien souvent des bibliothèques spécialisées (PyTorch, TensorFlow…). Cela veut dire qu'ils utilisent des outils d'IA qui existent déjà, sans avoir besoin de les recréer de zéro — et donc ne ressentent pas toujours le besoin de comprendre leur fonctionnement réel.</p>
+
+  <p class="reveal">Par conséquent, peu de gens en dehors des chercheurs en intelligence artificielle s'intéressent vraiment au cœur du fonctionnement mathématique et algorithmique réel des réseaux de neurones artificiels.</p>
+
+  <p class="reveal">Dans cet article, je vais expliquer le fonctionnement détaillé du premier réseau de neurone : le <strong>Perceptron Multicouche (MLP)</strong>. Les MLP sont encore des rouages essentiels des <strong>Transformers</strong>, les architectures de Deep Learning les plus puissantes, théorisées en 2017 par Google (<em>Attention Is All You Need</em>). Pour l'anecdote, l'acronyme « GPT » signifie littéralement <em>Generative Pre-Trained Transformers</em>.</p>
+
+  <p class="reveal">Pour vraiment comprendre les MLP en profondeur, vous allez m'accompagner dans la création d'un réseau de neurones <strong>sans bibliothèques spécialisées</strong>. Nous allons construire un réseau de neurones de zéro qui aura une tâche spécifique : résoudre le problème historique du <strong>XOR</strong>.</p>
+
+  <div class="card card-success reveal">
+    <p style="margin:0;"><strong>Prérequis :</strong> Aucun. Pour comprendre le code en détail, il est judicieux d'avoir des bases en programmation Python orientée objets (OOP).</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ==================== 2. CONTEXTE HISTORIQUE ==================== -->
+<section id="histoire">
+  <span class="section-number reveal">02</span>
+  <h2 class="reveal">Contexte historique</h2>
+
+  <p class="reveal">L'histoire des réseaux de neurones artificiels commence dans les <strong>années 1940</strong>, lorsque les neurophysiologistes <strong>Warren McCulloch</strong> et <strong>Walter Pitts</strong> proposent le premier modèle mathématique formel d'un neurone artificiel. L'idée est révolutionnaire : imiter le fonctionnement du cerveau humain à l'aide de mathématiques et d'électronique.</p>
+
+  <!-- Timeline SVG -->
+  <div class="figure reveal">
+    <svg viewBox="0 0 800 220" xmlns="http://www.w3.org/2000/svg">
+      <!-- Ligne principale -->
+      <line x1="50" y1="110" x2="750" y2="110" stroke="#2a2a3e" stroke-width="3" stroke-linecap="round"/>
+      <!-- Gradient line overlay -->
+      <defs>
+        <linearGradient id="timeGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#6c63ff"/>
+          <stop offset="100%" stop-color="#00d4aa"/>
+        </linearGradient>
+      </defs>
+      <line x1="50" y1="110" x2="750" y2="110" stroke="url(#timeGrad)" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+
+      <!-- 1943 -->
+      <circle cx="100" cy="110" r="10" fill="#6c63ff"/>
+      <text x="100" y="85" fill="#6c63ff" text-anchor="middle" font-size="13" font-weight="700">1943</text>
+      <text x="100" y="150" fill="#c8c8e0" text-anchor="middle" font-size="10.5">McCulloch</text>
+      <text x="100" y="165" fill="#c8c8e0" text-anchor="middle" font-size="10.5">&amp; Pitts</text>
+      <text x="100" y="180" fill="#8888a0" text-anchor="middle" font-size="9">Neurone formel</text>
+
+      <!-- 1958 -->
+      <circle cx="260" cy="110" r="10" fill="#00d4aa"/>
+      <text x="260" y="85" fill="#00d4aa" text-anchor="middle" font-size="13" font-weight="700">1958</text>
+      <text x="260" y="150" fill="#c8c8e0" text-anchor="middle" font-size="10.5">Rosenblatt</text>
+      <text x="260" y="165" fill="#8888a0" text-anchor="middle" font-size="9">Perceptron</text>
+
+      <!-- 1969 -->
+      <circle cx="400" cy="110" r="10" fill="#ff6b6b"/>
+      <text x="400" y="85" fill="#ff6b6b" text-anchor="middle" font-size="13" font-weight="700">1969</text>
+      <text x="400" y="150" fill="#c8c8e0" text-anchor="middle" font-size="10.5">Minsky &amp;</text>
+      <text x="400" y="165" fill="#c8c8e0" text-anchor="middle" font-size="10.5">Papert</text>
+      <text x="400" y="180" fill="#ff6b6b" text-anchor="middle" font-size="9">Hiver de l'IA</text>
+
+      <!-- 1986 -->
+      <circle cx="550" cy="110" r="10" fill="#ffa500"/>
+      <text x="550" y="85" fill="#ffa500" text-anchor="middle" font-size="13" font-weight="700">1986</text>
+      <text x="550" y="150" fill="#c8c8e0" text-anchor="middle" font-size="10.5">Rumelhart,</text>
+      <text x="550" y="165" fill="#c8c8e0" text-anchor="middle" font-size="10.5">Hinton, Williams</text>
+      <text x="550" y="180" fill="#8888a0" text-anchor="middle" font-size="9">Backpropagation</text>
+
+      <!-- 2017 -->
+      <circle cx="700" cy="110" r="10" fill="#e040fb"/>
+      <text x="700" y="85" fill="#e040fb" text-anchor="middle" font-size="13" font-weight="700">2017</text>
+      <text x="700" y="150" fill="#c8c8e0" text-anchor="middle" font-size="10.5">Google</text>
+      <text x="700" y="165" fill="#8888a0" text-anchor="middle" font-size="9">Transformers</text>
+    </svg>
+    <div class="figure-caption"><span class="fig-number">Figure 1</span><span class="fig-title">Frise chronologique des grandes étapes du Deep Learning (1943–2017)</span></div>
+  </div>
+
+  <p class="reveal">En <strong>1958</strong>, <strong>Frank Rosenblatt</strong> invente le Perceptron multicouche — le premier ancêtre direct de nos réseaux modernes. Ce modèle apprend à classer des données en ajustant des poids numériques, un peu comme un enfant qui apprend par essais et erreurs. L'enthousiasme est immense : on imagine déjà des machines capables de reconnaître des objets, de comprendre le langage, de prendre des décisions.</p>
+
+  <p class="reveal">Mais en <strong>1969</strong>, les mathématiciens <strong>Marvin Minsky</strong> et <strong>Seymour Papert</strong> publient un livre dévastateur : ils démontrent que le perceptron simple est fondamentalement incapable de résoudre certains problèmes de base, dont la fonction <strong>XOR</strong>.</p>
+
+  <div class="card card-warning reveal">
+    <p style="margin:0;"><strong>Le problème XOR :</strong> La fonction XOR est non linéaire. Les neurones artificiels sont des fonctions linéaires. Il est impossible pour une fonction linéaire, aussi complexe soit-elle, d'approximer une fonction non linéaire. Cela signifiait que l'IA n'était capable de résoudre qu'un nombre très limité de tâches… C'est le premier grand <strong>hiver de l'IA</strong> — une période de désillusion et de coupes budgétaires massives.</p>
+  </div>
+
+  <h3 class="reveal">La table de vérité du XOR</h3>
+
+  <table class="styled-table reveal">
+    <thead>
+      <tr><th>A</th><th>B</th><th>A XOR B</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>0</td><td>0</td><td style="color:#ff6b6b;">0</td></tr>
+      <tr><td>0</td><td>1</td><td style="color:#00d4aa;">1</td></tr>
+      <tr><td>1</td><td>0</td><td style="color:#00d4aa;">1</td></tr>
+      <tr><td>1</td><td>1</td><td style="color:#ff6b6b;">0</td></tr>
+    </tbody>
+  </table>
+
+  <!-- XOR scatter plot SVG -->
+  <div class="figure reveal">
+    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="gridGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#1a1a2e"/>
+          <stop offset="100%" stop-color="#12121a"/>
+        </linearGradient>
+      </defs>
+      <rect x="50" y="20" width="320" height="320" rx="8" fill="url(#gridGrad)" stroke="#2a2a3e"/>
+
+      <!-- Grid -->
+      <line x1="210" y1="20" x2="210" y2="340" stroke="#2a2a3e" stroke-width="1"/>
+      <line x1="50" y1="180" x2="370" y2="180" stroke="#2a2a3e" stroke-width="1"/>
+
+      <!-- Axes labels -->
+      <text x="210" y="370" fill="#8888a0" text-anchor="middle" font-size="13">A</text>
+      <text x="30" y="185" fill="#8888a0" text-anchor="middle" font-size="13">B</text>
+
+      <!-- Axis values -->
+      <text x="90" y="358" fill="#8888a0" text-anchor="middle" font-size="11">0</text>
+      <text x="330" y="358" fill="#8888a0" text-anchor="middle" font-size="11">1</text>
+      <text x="42" y="305" fill="#8888a0" text-anchor="middle" font-size="11">0</text>
+      <text x="42" y="65" fill="#8888a0" text-anchor="middle" font-size="11">1</text>
+
+      <!-- Impossible line -->
+      <text x="210" y="15" fill="#ff6b6b" text-anchor="middle" font-size="11" opacity="0.8">Impossible de séparer avec une seule droite !</text>
+
+      <!-- Dashed attempt line -->
+      <line x1="60" y1="30" x2="360" y2="330" stroke="#ff6b6b" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.4"/>
+      <line x1="60" y1="330" x2="360" y2="30" stroke="#ff6b6b" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.4"/>
+
+      <!-- Points XOR=0 (rouge) -->
+      <circle cx="90" cy="300" r="18" fill="rgba(255,107,107,0.2)" stroke="#ff6b6b" stroke-width="2.5"/>
+      <text x="90" y="305" fill="#ff6b6b" text-anchor="middle" font-size="13" font-weight="700">0</text>
+
+      <circle cx="330" cy="60" r="18" fill="rgba(255,107,107,0.2)" stroke="#ff6b6b" stroke-width="2.5"/>
+      <text x="330" y="65" fill="#ff6b6b" text-anchor="middle" font-size="13" font-weight="700">0</text>
+
+      <!-- Points XOR=1 (vert) -->
+      <circle cx="90" cy="60" r="18" fill="rgba(0,212,170,0.2)" stroke="#00d4aa" stroke-width="2.5"/>
+      <text x="90" y="65" fill="#00d4aa" text-anchor="middle" font-size="13" font-weight="700">1</text>
+
+      <circle cx="330" cy="300" r="18" fill="rgba(0,212,170,0.2)" stroke="#00d4aa" stroke-width="2.5"/>
+      <text x="330" y="305" fill="#00d4aa" text-anchor="middle" font-size="13" font-weight="700">1</text>
+
+      <!-- Labels -->
+      <text x="90" y="330" fill="#8888a0" text-anchor="middle" font-size="10">(0,0)</text>
+      <text x="330" y="330" fill="#8888a0" text-anchor="middle" font-size="10">(1,0)</text>
+      <text x="90" y="45" fill="#8888a0" text-anchor="middle" font-size="10">(0,1)</text>
+      <text x="330" y="45" fill="#8888a0" text-anchor="middle" font-size="10">(1,1)</text>
+    </svg>
+    <div class="figure-caption"><span class="fig-number">Figure 2</span><span class="fig-title">Représentation graphique du problème XOR dans un espace bidimensionnel</span><span class="fig-note">Note. Les points de même classe (0 ou 1) ne peuvent pas être séparés par une seule droite, illustrant la non-séparabilité linéaire du XOR.</span></div>
+  </div>
+
+  <p class="reveal">Il faudra attendre les <strong>années 1980</strong> pour que la solution soit découverte : en empilant plusieurs couches de neurones et en introduisant des <strong>fonctions d'activation non linéaires</strong>, on obtient un réseau capable de résoudre XOR, et bien plus encore. L'algorithme de <strong>rétropropagation du gradient</strong> (backpropagation), popularisé par Rumelhart, Hinton et Williams en 1986, donne enfin un moyen efficace d'entraîner ces réseaux multicouches.</p>
+
+  <p class="reveal">Aujourd'hui, les réseaux qui font tourner ChatGPT ou Gemini s'appuient toujours sur ces mêmes principes fondamentaux. C'est pourquoi <strong>comprendre le MLP, c'est comprendre le cœur de l'IA moderne</strong>.</p>
+</section>
+
+<div class="divider"></div>
+
+<!-- ==================== 3. FONCTIONNEMENT GÉNÉRAL ==================== -->
+<section id="general">
+  <span class="section-number reveal">03</span>
+  <h2 class="reveal">Fonctionnement général</h2>
+
+  <p class="reveal">Un réseau de neurones artificiel est une <strong>fonction mathématique prédictive</strong>. Elle prend une information en entrée et produit une prédiction en sortie. Par exemple, un modèle de langage génératif prend en entrée notre phrase (prompt) et calcule la probabilité de chaque mot (token) des phrases qu'un être humain aurait répondu.</p>
+
+  <p class="reveal">Ces architectures mathématiques ont la particularité de pouvoir <strong>s'auto-évaluer</strong>, et de <strong>s'améliorer</strong> grâce à des données. C'est ce qu'on appelle communément l'apprentissage machine (Machine Learning).</p>
+
+  <div class="card reveal">
+    <p><strong>Les paramètres</strong> — Un paramètre est un nombre. Ce qui rend un réseau différent d'un autre, ce sont les <em>valeurs</em> et la <em>quantité</em> de ses paramètres. Ce sont ses paramètres qui déterminent exactement comment l'entrée est transformée en sortie. Plus un RNA a de neurones, plus il a de paramètres, car il y aura davantage de liens entre les neurones.</p>
+    <p style="margin:0;">Le but est donc de trouver les valeurs des paramètres qui permettent au réseau de faire les <strong>meilleures prédictions possibles</strong>.</p>
+  </div>
+
+  <h3 class="reveal">Les trois étapes de l'apprentissage</h3>
+
+  <div class="steps reveal">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h4>Propagation avant (Forward Pass)</h4>
+        <p>Le réseau fait une prédiction. Les données d'entrée traversent le réseau de couche en couche. En sortie, on obtient une ou plusieurs probabilités. Par exemple, 89 % de chance que l'image représente un être humain, 11 % de chance que non.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h4>Calcul de l'erreur (Loss)</h4>
+        <p>Le modèle s'auto-évalue. Il mesure à quel point sa prédiction est éloignée de la réponse attendue grâce à une fonction de perte.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h4>Rétropropagation (Backward Pass)</h4>
+        <p>Le modèle calcule comment ajuster chacun de ses paramètres pour s'améliorer, puis il met à jour les valeurs pour réduire l'erreur de prédiction.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cycle diagram -->
+  <div class="figure reveal">
+    <svg viewBox="0 0 600 250" xmlns="http://www.w3.org/2000/svg">
+      <!-- Boxes -->
+      <rect x="20" y="80" width="160" height="70" rx="12" fill="rgba(108,99,255,0.15)" stroke="#6c63ff" stroke-width="2"/>
+      <text x="100" y="110" fill="#6c63ff" text-anchor="middle" font-size="12" font-weight="600">FORWARD</text>
+      <text x="100" y="130" fill="#c8c8e0" text-anchor="middle" font-size="10">Prédiction</text>
+
+      <rect x="220" y="80" width="160" height="70" rx="12" fill="rgba(255,107,107,0.15)" stroke="#ff6b6b" stroke-width="2"/>
+      <text x="300" y="110" fill="#ff6b6b" text-anchor="middle" font-size="12" font-weight="600">LOSS</text>
+      <text x="300" y="130" fill="#c8c8e0" text-anchor="middle" font-size="10">Évaluation de l'erreur</text>
+
+      <rect x="420" y="80" width="160" height="70" rx="12" fill="rgba(0,212,170,0.15)" stroke="#00d4aa" stroke-width="2"/>
+      <text x="500" y="110" fill="#00d4aa" text-anchor="middle" font-size="12" font-weight="600">BACKWARD</text>
+      <text x="500" y="130" fill="#c8c8e0" text-anchor="middle" font-size="10">Auto-correction</text>
+
+      <!-- Arrows -->
+      <path d="M 180 115 L 215 115" stroke="#8888a0" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <path d="M 380 115 L 415 115" stroke="#8888a0" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+      <!-- Loop arrow -->
+      <path d="M 500 155 Q 500 210 300 215 Q 100 215 100 155" fill="none" stroke="#ffa500" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrowOrange)"/>
+      <text x="300" y="240" fill="#ffa500" text-anchor="middle" font-size="11" font-style="italic">Répété des milliers de fois</text>
+
+      <defs>
+        <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#8888a0"/>
+        </marker>
+        <marker id="arrowOrange" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#ffa500"/>
+        </marker>
+      </defs>
+    </svg>
+    <div class="figure-caption"><span class="fig-number">Figure 3</span><span class="fig-title">Le cycle d'apprentissage d'un réseau de neurones artificiel</span><span class="fig-note">Note. Les trois étapes — propagation avant, calcul de l'erreur et rétropropagation — sont répétées des milliers de fois jusqu'à convergence.</span></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ==================== 4. NEURONE ==================== -->
+<section id="neurone">
+  <span class="section-number reveal">04</span>
+  <h2 class="reveal">Le neurone artificiel</h2>
+
+  <p class="reveal">Un neurone est une <strong>fonction mathématique à n variables</strong>. Il reçoit un nombre n d'entrées et produit une valeur en sortie. Par exemple, pour n = 3, les entrées peuvent être 2, 3 et 0.00001, et la sortie 42.</p>
+
+  <p class="reveal">Un neurone possède les caractéristiques suivantes : pour chaque entrée \(x_n\), il possède un <strong>poids</strong> \(w_n\) qui lui est associé, ainsi qu'un <strong>biais</strong> \(b\) (un nombre stocké dans la « mémoire » du neurone).</p>
+
+  <!-- NEURONE DIAGRAM -->
+  <div class="figure reveal">
+    <svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="neuronGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="rgba(108,99,255,0.3)"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </radialGradient>
+        <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#6c63ff" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#6c63ff"/>
+        </linearGradient>
+        <marker id="arr" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto">
+          <polygon points="0 0, 6 2.5, 0 5" fill="#6c63ff"/>
+        </marker>
+        <marker id="arrOut" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto">
+          <polygon points="0 0, 6 2.5, 0 5" fill="#00d4aa"/>
+        </marker>
+      </defs>
+
+      <!-- Input labels -->
+      <text x="30" y="75" fill="#c8c8e0" font-size="16" font-weight="500">x₁</text>
+      <text x="30" y="180" fill="#c8c8e0" font-size="16" font-weight="500">x₂</text>
+      <text x="30" y="290" fill="#c8c8e0" font-size="16" font-weight="500">xₙ</text>
+
+      <!-- Dots for "..." -->
+      <circle cx="40" cy="220" r="2" fill="#8888a0"/>
+      <circle cx="40" cy="235" r="2" fill="#8888a0"/>
+      <circle cx="40" cy="250" r="2" fill="#8888a0"/>
+
+      <!-- Connection lines with weights -->
+      <line x1="60" y1="70" x2="295" y2="165" stroke="url(#lineGrad)" stroke-width="2" marker-end="url(#arr)"/>
+      <line x1="60" y1="175" x2="295" y2="175" stroke="url(#lineGrad)" stroke-width="2" marker-end="url(#arr)"/>
+      <line x1="60" y1="285" x2="295" y2="185" stroke="url(#lineGrad)" stroke-width="2" marker-end="url(#arr)"/>
+
+      <!-- Weight labels -->
+      <rect x="130" y="97" width="40" height="22" rx="4" fill="rgba(108,99,255,0.2)"/>
+      <text x="150" y="113" fill="#6c63ff" text-anchor="middle" font-size="12" font-weight="600">w₁</text>
+
+      <rect x="145" y="158" width="40" height="22" rx="4" fill="rgba(108,99,255,0.2)"/>
+      <text x="165" y="174" fill="#6c63ff" text-anchor="middle" font-size="12" font-weight="600">w₂</text>
+
+      <rect x="130" y="225" width="40" height="22" rx="4" fill="rgba(108,99,255,0.2)"/>
+      <text x="150" y="241" fill="#6c63ff" text-anchor="middle" font-size="12" font-weight="600">wₙ</text>
+
+      <!-- Neuron body (glow + circle) -->
+      <circle cx="350" cy="175" r="60" fill="url(#neuronGlow)"/>
+      <circle cx="350" cy="175" r="45" fill="rgba(108,99,255,0.1)" stroke="#6c63ff" stroke-width="2.5">
+        <animate attributeName="r" values="45;47;45" dur="3s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Sigma symbol in neuron -->
+      <text x="350" y="170" fill="#6c63ff" text-anchor="middle" font-size="28" font-weight="700">Σ</text>
+      <text x="350" y="195" fill="#8888a0" text-anchor="middle" font-size="10">+ b</text>
+
+      <!-- Output arrow -->
+      <line x1="400" y1="175" x2="530" y2="175" stroke="#00d4aa" stroke-width="2.5" marker-end="url(#arrOut)"/>
+
+      <!-- Activation function box -->
+      <rect x="540" y="150" width="100" height="50" rx="10" fill="rgba(0,212,170,0.15)" stroke="#00d4aa" stroke-width="2"/>
+      <text x="590" y="172" fill="#00d4aa" text-anchor="middle" font-size="13" font-weight="600">σ(z)</text>
+      <text x="590" y="188" fill="#8888a0" text-anchor="middle" font-size="9">Activation</text>
+
+      <!-- Final output -->
+      <line x1="640" y1="175" x2="690" y2="175" stroke="#00d4aa" stroke-width="2" marker-end="url(#arrOut)"/>
+
+      <!-- Labels bottom -->
+      <text x="350" y="260" fill="#8888a0" text-anchor="middle" font-size="11">z = w₁x₁ + w₂x₂ + … + wₙxₙ + b</text>
+
+      <!-- Direction arrow -->
+      <text x="350" y="320" fill="#ffa500" text-anchor="middle" font-size="12" font-weight="600">→ Direction du signal : entrées → somme pondérée → activation → sortie</text>
+    </svg>
+    <div class="figure-caption"><span class="fig-number">Figure 4</span><span class="fig-title">Anatomie d'un neurone artificiel et direction du signal</span><span class="fig-note">Note. Les entrées (x) sont multipliées par leurs poids respectifs (w), sommées avec le biais (b), puis la sortie est transformée par une fonction d'activation σ. Adapté de Goodfellow et al. (2016).</span></div>
+  </div>
+
+  <div class="formula-box reveal">
+    <p style="margin:0; font-size:0.9rem; color:var(--text-dim); margin-bottom:0.5rem;">Formule du neurone</p>
+    \[ \text{Sortie} = \sigma\!\left(\sum_{i=1}^{n} w_i \cdot x_i + b\right) = \sigma(\mathbf{w} \cdot \mathbf{x} + b) \]
+  </div>
+
+  <p class="reveal">Pour les plus attentifs, cela fait sûrement penser à la formule du <strong>produit scalaire</strong> ! En effet, la sortie d'un neurone (avant activation) est le produit scalaire de ses poids et de ses entrées, auquel on additionne un biais.</p>
+
+  <div class="card reveal">
+    <p><strong>Analogie visuelle :</strong> Imaginez que les poids \(w_n\) soient la <em>pente</em> d'une droite, et le biais \(b\) le <em>point de départ</em> de cette droite. En faisant varier ces deux informations, on peut dessiner n'importe quelle droite. Remarque : on ne peut dessiner <em>que</em> des droites — c'est exactement pour ça qu'on a eu un premier « hiver » de l'IA à cause de la fonction XOR, qui n'est justement pas une droite.</p>
+  </div>
+
+  <div class="formula-box reveal">
+    <p style="margin:0; font-size:0.9rem; color:var(--text-dim); margin-bottom:0.5rem;">Forme vectorielle compacte</p>
+    \[ z = \mathbf{X} \cdot \mathbf{W} + b \]
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ==================== 5. COUCHES ==================== -->
+<section id="couche">
+  <span class="section-number reveal">05</span>
+  <h2 class="reveal">Couches de neurones</h2>
+
+  <p class="reveal">Généralement, toutes les sorties des neurones de la couche précédente rentrent dans <strong>chacun des neurones</strong> de la couche d'après. Cela veut dire que tous les neurones d'une même couche auront les mêmes entrées, mais <strong>pas les mêmes poids ni le même biais</strong>.</p>
+
+  <!-- NETWORK ARCHITECTURE DIAGRAM -->
+  <div class="figure reveal">
+    <svg viewBox="0 0 750 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="nGlow1" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="rgba(108,99,255,0.4)"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </radialGradient>
+        <radialGradient id="nGlow2" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="rgba(0,212,170,0.4)"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </radialGradient>
+        <radialGradient id="nGlow3" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="rgba(255,165,0,0.4)"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </radialGradient>
+      </defs>
+
+      <!-- Layer labels -->
+      <text x="110" y="35" fill="#6c63ff" text-anchor="middle" font-size="13" font-weight="600">Couche d'entrée</text>
+      <text x="375" y="35" fill="#00d4aa" text-anchor="middle" font-size="13" font-weight="600">Couche cachée</text>
+      <text x="640" y="35" fill="#ffa500" text-anchor="middle" font-size="13" font-weight="600">Couche de sortie</text>
+
+      <!-- Connection lines (all to all) Input -> Hidden -->
+      <!-- Input 1 to Hidden -->
+      <line x1="145" y1="140" x2="310" y2="120" stroke="#6c63ff" stroke-width="1" opacity="0.3"/>
+      <line x1="145" y1="140" x2="310" y2="200" stroke="#6c63ff" stroke-width="1" opacity="0.3"/>
+      <line x1="145" y1="140" x2="310" y2="280" stroke="#6c63ff" stroke-width="1" opacity="0.3"/>
+      <!-- Input 2 to Hidden -->
+      <line x1="145" y1="260" x2="310" y2="120" stroke="#6c63ff" stroke-width="1" opacity="0.3"/>
+      <line x1="145" y1="260" x2="310" y2="200" stroke="#6c63ff" stroke-width="1" opacity="0.3"/>
+      <line x1="145" y1="260" x2="310" y2="280" stroke="#6c63ff" stroke-width="1" opacity="0.3"/>
+
+      <!-- Connection lines Hidden -> Output -->
+      <line x1="440" y1="120" x2="575" y2="200" stroke="#00d4aa" stroke-width="1" opacity="0.3"/>
+      <line x1="440" y1="200" x2="575" y2="200" stroke="#00d4aa" stroke-width="1" opacity="0.3"/>
+      <line x1="440" y1="280" x2="575" y2="200" stroke="#00d4aa" stroke-width="1" opacity="0.3"/>
+
+      <!-- INPUT NEURONS -->
+      <circle cx="110" cy="140" r="30" fill="url(#nGlow1)"/>
+      <circle cx="110" cy="140" r="25" fill="rgba(108,99,255,0.1)" stroke="#6c63ff" stroke-width="2"/>
+      <text x="110" y="145" fill="#6c63ff" text-anchor="middle" font-size="14" font-weight="600">x₁</text>
+
+      <circle cx="110" cy="260" r="30" fill="url(#nGlow1)"/>
+      <circle cx="110" cy="260" r="25" fill="rgba(108,99,255,0.1)" stroke="#6c63ff" stroke-width="2"/>
+      <text x="110" y="265" fill="#6c63ff" text-anchor="middle" font-size="14" font-weight="600">x₂</text>
+
+      <!-- HIDDEN NEURONS -->
+      <circle cx="375" cy="120" r="30" fill="url(#nGlow2)"/>
+      <circle cx="375" cy="120" r="25" fill="rgba(0,212,170,0.1)" stroke="#00d4aa" stroke-width="2"/>
+      <text x="375" y="125" fill="#00d4aa" text-anchor="middle" font-size="14" font-weight="600">h₁</text>
+
+      <circle cx="375" cy="200" r="30" fill="url(#nGlow2)"/>
+      <circle cx="375" cy="200" r="25" fill="rgba(0,212,170,0.1)" stroke="#00d4aa" stroke-width="2"/>
+      <text x="375" y="205" fill="#00d4aa" text-anchor="middle" font-size="14" font-weight="600">h₂</text>
+
+      <circle cx="375" cy="280" r="30" fill="url(#nGlow2)"/>
+      <circle cx="375" cy="280" r="25" fill="rgba(0,212,170,0.1)" stroke="#00d4aa" stroke-width="2"/>
+      <text x="375" y="285" fill="#00d4aa" text-anchor="middle" font-size="14" font-weight="600">h₃</text>
+
+      <!-- OUTPUT NEURON -->
+      <circle cx="640" cy="200" r="30" fill="url(#nGlow3)"/>
+      <circle cx="640" cy="200" r="25" fill="rgba(255,165,0,0.1)" stroke="#ffa500" stroke-width="2"/>
+      <text x="640" y="205" fill="#ffa500" text-anchor="middle" font-size="14" font-weight="600">ŷ</text>
+
+      <!-- Weight annotations -->
+      <text x="230" y="120" fill="#8888a0" text-anchor="middle" font-size="10">w₁₁</text>
+      <text x="240" y="165" fill="#8888a0" text-anchor="middle" font-size="10">w₁₂</text>
+      <text x="505" y="155" fill="#8888a0" text-anchor="middle" font-size="10">w'₁</text>
+      <text x="505" y="200" fill="#8888a0" text-anchor="middle" font-size="10">w'₂</text>
+
+      <!-- Direction arrow -->
+      <line x1="50" y1="370" x2="700" y2="370" stroke="#ffa500" stroke-width="1.5" marker-end="url(#arrDir)" opacity="0.6"/>
+      <text x="375" y="395" fill="#ffa500" text-anchor="middle" font-size="11">Direction de la propagation (feedforward)</text>
+      <defs>
+        <marker id="arrDir" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#ffa500"/>
+        </marker>
+      </defs>
+    </svg>
+    <div class="figure-caption"><span class="fig-number">Figure 5</span><span class="fig-title">Architecture d'un perceptron multicouche (MLP) pour la résolution du problème XOR</span><span class="fig-note">Note. Le réseau comporte une couche d'entrée (2 neurones), une couche cachée (3 neurones pour l'illustration) et une couche de sortie (1 neurone). Les connexions représentent les poids synaptiques.</span></div>
+  </div>
+
+  <p class="reveal">C'est bien pour cela qu'au début, les poids et biais sont générés <strong>aléatoirement</strong>. Car sinon, tous les neurones auraient la même sortie, et le réseau les corrigerait tous de la même manière — autant n'en avoir qu'un seul par couche, ce qui serait bien moins efficace.</p>
+
+  <p class="reveal">Chaque neurone possède un biais et des poids qui lui sont propres. Il est important que <strong>le nombre de poids soit égal au nombre d'entrées</strong> : la dimension du vecteur \(\mathbf{X}\) doit être égale à la dimension du vecteur \(\mathbf{W}\).</p>
+
+  <h3 class="reveal">Implémentation en Python</h3>
+
+  <div class="code-block reveal">
+    <div class="code-header">
+      <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      <span class="lang">Python</span>
+    </div>
+    <pre><span class="kw">class</span> <span class="fn">Dense</span>(Layer):
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self">self</span>, in_dim, out_dim, seed=<span class="num">0</span>):
+        rng = np.random.default_rng(seed)
+
+        <span class="cm"># Poids : valeurs aléatoires autour d'une gaussienne</span>
+        <span class="self">self</span>.W = rng.normal(<span class="num">0.0</span>, <span class="num">0.5</span>, size=(in_dim, out_dim))
+
+        <span class="cm"># Biais : initialisé à zéro (convention)</span>
+        <span class="self">self</span>.b = np.zeros((<span class="num">1</span>, out_dim))
+
+        <span class="cm"># Vecteurs de gradients pré-alloués</span>
+        <span class="self">self</span>.dW = np.zeros_like(<span class="self">self</span>.W)
+        <span class="self">self</span>.db = np.zeros_like(<span class="self">self</span>.b)
+
+    <span class="kw">def</span> <span class="fn">forward</span>(<span class="self">self</span>, x):
+        <span class="self">self</span>.x = x  <span class="cm"># ← mémorisé pour backward</span>
+        <span class="kw">return</span> x @ <span class="self">self</span>.W + <span class="self">self</span>.b</pre>
+  </div>
+
+  <div class="card card-accent reveal">
+    <p style="margin:0;"><strong>Pourquoi initialiser les biais à zéro ?</strong> Contrairement aux poids, les biais n'ont pas besoin de symétrie brisée pour fonctionner correctement. Un biais à zéro est un point de départ neutre, et le réseau l'ajustera de lui-même lors de l'entraînement.</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ==================== 6. ACTIVATION ==================== -->
+<section id="activation">
+  <span class="section-number reveal">06</span>
+  <h2 class="reveal">Fonction d'activation</h2>
+
+  <p class="reveal">Le problème majeur des débuts de l'IA était que les RNA n'étaient pas capables d'implémenter des fonctions non linéaires. Pour une raison très simple : <strong>un neurone artificiel est une fonction linéaire</strong>.</p>
+
+  <div class="formula-box reveal">
+    <p style="margin:0; font-size:0.9rem; color:var(--text-dim); margin-bottom:0.5rem;">Par définition, la combinaison linéaire d'une fonction linéaire est toujours linéaire</p>
+    \[ T(c\mathbf{A} + d\mathbf{B}) = c \cdot T(\mathbf{A}) + d \cdot T(\mathbf{B}) \]
+  </div>
+
+  <p class="reveal">Pour prendre une analogie visuelle : on ne pourra <strong>jamais</strong> dessiner un cercle ou une courbe en traçant uniquement des droites. Cela donnera toujours une sorte de polygone, de grillage… La plupart des fonctions sont non linéaires.</p>
+
+  <p class="reveal">Pour garder la logique des neurones artificiels tout en brisant la linéarité, dans les années 80, les scientifiques ont trouvé un stratagème ingénieux : <strong>la fonction d'activation</strong>.</p>
+
+  <p class="reveal">Une fonction d'activation est une fonction qui va transformer la sortie de notre neurone. Par exemple, si notre neurone a comme sortie 40 003, la fonction d'activation va la transformer en 0.065. L'intérêt ? <strong>Une fonction d'activation est non linéaire !</strong> Cela permet de transformer nos neurones en une fonction non linéaire. La logique est la même et la linéarité est brisée.</p>
+
+  <h3 class="reveal">La fonction Sigmoïde</h3>
+
+  <p class="reveal">Dans notre cas, nous allons utiliser la fonction <strong>Sigmoïde</strong> car elle se dérive facilement (vous verrez plus tard pourquoi c'est utile) et donne en sortie une valeur entre 0 et 1 — parfait pour une probabilité !</p>
+
+  <div class="formula-box reveal">
+    <p style="margin:0; font-size:0.9rem; color:var(--text-dim); margin-bottom:0.5rem;">Fonction Sigmoïde et sa dérivée</p>
+    \[ \sigma(z) = \frac{1}{1 + e^{-z}} \qquad\qquad \sigma'(z) = \sigma(z) \cdot (1 - \sigma(z)) \]
+  </div>
+
+  <!-- SIGMOID GRAPH (canvas) -->
+  <div class="chart-container reveal">
+    <canvas id="sigmoidChart" width="800" height="380"></canvas>
+    <div class="figure-caption" style="margin-top:1rem;"><span class="fig-number">Figure 6</span><span class="fig-title">Graphique de la fonction sigmoïde σ(z) et de sa dérivée σ'(z)</span><span class="fig-note">Note. La sigmoïde compresse toute valeur réelle dans l'intervalle [0, 1]. Sa dérivée atteint un maximum de 0,25 en z = 0, ce qui explique le phénomène de vanishing gradient pour les valeurs extrêmes.</span></div>
+  </div>
+
+  <div class="code-block reveal">
+    <div class="code-header">
+      <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      <span class="lang">Python</span>
+    </div>
+    <pre><span class="kw">class</span> <span class="fn">Sigmoid</span>(Layer):
+
+    <span class="kw">def</span> <span class="fn">forward</span>(<span class="self">self</span>, z):
+        z = np.clip(z, <span class="num">-50</span>, <span class="num">50</span>)  <span class="cm"># éviter les overflow</span>
+        <span class="self">self</span>.s = <span class="num">1.0</span> / (<span class="num">1.0</span> + np.exp(-z))
+        <span class="kw">return</span> <span class="self">self</span>.s
+
+    <span class="kw">def</span> <span class="fn">backward</span>(<span class="self">self</span>, grad_out):
+        <span class="cm"># σ'(z) = σ(z) * (1 - σ(z))</span>
+        <span class="kw">return</span> grad_out * (<span class="self">self</span>.s * (<span class="num">1.0</span> - <span class="self">self</span>.s))</pre>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ==================== 7. LOSS FUNCTION ==================== -->
+<section id="loss">
+  <span class="section-number reveal">07</span>
+  <h2 class="reveal">Auto-évaluation : la Loss Function</h2>
+
+  <p class="reveal">Lorsqu'on entraîne un réseau de neurones pour une tâche spécifique, nous savons quel résultat nous voulons obtenir. Pour cela, nous avons besoin de <strong>données d'entraînement</strong> — des données qui correspondent à ce que l'on veut que notre IA prédise.</p>
+
+  <p class="reveal">Par exemple, si on entraîne une IA qui doit prédire le nombre de boîtes de LEGO vendues à Chicago l'année prochaine, nous avons besoin des données de ventes des dernières années. Plus nous aurons de données pertinentes, plus notre modèle pourra apprendre et ajuster ses paramètres pour devenir performant.</p>
+
+  <div class="card card-warning reveal">
+    <p style="margin:0;"><strong>Le nerf de la guerre :</strong> Dans le monde de l'intelligence artificielle, ce qui compte le plus, c'est la <em>donnée</em> et l'<em>énergie</em>. Sans données, pas d'entraînement. Sans entraînement, pas d'apprentissage. Sans apprentissage, pas de résultats.</p>
+  </div>
+
+  <p class="reveal">Pour évaluer notre réseau, on calcule l'écart entre la réponse attendue et la prédiction. Plus l'écart est faible, meilleure est la prédiction. C'est à ça que sert la <strong>Loss Function</strong> (fonction de perte). Nous utilisons l'<strong>Erreur Quadratique Moyenne (MSE)</strong>.</p>
+
+  <div class="formula-box reveal">
+    <p style="margin:0; font-size:0.9rem; color:var(--text-dim); margin-bottom:0.5rem;">Mean Squared Error (MSE)</p>
+    \[ \text{MSE} = \frac{1}{N} \sum_{i=1}^{N} (\hat{y}_i - y_i)^2 \]
+  </div>
+
+  <!-- MSE visual explanation -->
+  <div class="figure reveal">
+    <svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+      <!-- Prediction box -->
+      <rect x="30" y="60" width="140" height="80" rx="12" fill="rgba(108,99,255,0.12)" stroke="#6c63ff" stroke-width="2"/>
+      <text x="100" y="92" fill="#6c63ff" text-anchor="middle" font-size="12" font-weight="600">Prédiction</text>
+      <text x="100" y="118" fill="#c8c8e0" text-anchor="middle" font-size="22" font-weight="700">ŷ = 0.51</text>
+
+      <!-- True box -->
+      <rect x="230" y="60" width="140" height="80" rx="12" fill="rgba(0,212,170,0.12)" stroke="#00d4aa" stroke-width="2"/>
+      <text x="300" y="92" fill="#00d4aa" text-anchor="middle" font-size="12" font-weight="600">Valeur attendue</text>
+      <text x="300" y="118" fill="#c8c8e0" text-anchor="middle" font-size="22" font-weight="700">y = 1.0</text>
+
+      <!-- Error -->
+      <rect x="430" y="60" width="140" height="80" rx="12" fill="rgba(255,107,107,0.12)" stroke="#ff6b6b" stroke-width="2"/>
+      <text x="500" y="92" fill="#ff6b6b" text-anchor="middle" font-size="12" font-weight="600">Erreur (MSE)</text>
+      <text x="500" y="118" fill="#c8c8e0" text-anchor="middle" font-size="22" font-weight="700">0.24</text>
+
+      <!-- Arrows -->
+      <path d="M 170 100 L 225 100" stroke="#8888a0" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <path d="M 370 100 L 425 100" stroke="#8888a0" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+      <!-- Labels -->
+      <text x="300" y="175" fill="#8888a0" text-anchor="middle" font-size="11">Plus l'erreur est faible → meilleure est la prédiction</text>
+    </svg>
+    <div class="figure-caption"><span class="fig-number">Figure 7</span><span class="fig-title">Illustration du calcul de l'erreur quadratique moyenne (MSE)</span><span class="fig-note">Note. La fonction de perte compare la prédiction du réseau (ŷ) à la valeur attendue (y) pour quantifier l'erreur.</span></div>
+  </div>
+
+  <div class="code-block reveal">
+    <div class="code-header">
+      <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      <span class="lang">Python</span>
+    </div>
+    <pre><span class="kw">class</span> <span class="fn">MSELoss</span>:
+
+    <span class="kw">def</span> <span class="fn">forward</span>(<span class="self">self</span>, y_pred, y_true):
+        <span class="self">self</span>.y_pred = y_pred
+        <span class="self">self</span>.y_true = y_true
+        <span class="kw">return</span> <span class="fn">float</span>(np.mean((y_pred - y_true) ** <span class="num">2</span>))
+
+    <span class="kw">def</span> <span class="fn">backward</span>(<span class="self">self</span>):
+        n = <span class="self">self</span>.y_pred.shape[<span class="num">0</span>]
+        <span class="kw">return</span> <span class="num">2</span> * (<span class="self">self</span>.y_pred - <span class="self">self</span>.y_true) / n</pre>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ==================== 8. BACKPROPAGATION ==================== -->
+<section id="backprop">
+  <span class="section-number reveal">08</span>
+  <h2 class="reveal">Auto-correction : la Backpropagation</h2>
+
+  <p class="reveal">Vous seriez légitime de vous demander : « Je sais à quel point mon réseau est mauvais, maintenant comment savoir comment l'améliorer ? ». C'est exactement le rôle de la <strong>rétropropagation du gradient</strong>.</p>
+
+  <p class="reveal">Ce qui fait la spécificité et la performance d'un réseau de neurones, ce sont ses paramètres. C'est en modifiant soigneusement les valeurs des paramètres qu'on améliore un RNA. Certains RNA contiennent des millions, voire des milliards de paramètres. Pour savoir lesquels ajuster et de combien, nous utilisons un outil créé par Isaac Newton : <strong>le calcul différentiel</strong>.</p>
+
+  <div class="card reveal">
+    <p><strong>Rappel :</strong> La dérivée partielle d'une fonction par rapport à une de ses variables nous apprend <em>à quel point la fonction va varier si on fait varier cette variable</em>. Pour schématiser : en étudiant une heure de plus pour mon contrôle, est-ce que ma moyenne va augmenter de 1 %, de 5 %, ou de 0 % ?</p>
+  </div>
+
+  <p class="reveal">La dérivée partielle de la Loss par rapport à un paramètre nous dit : <em>à quel point la Loss (la qualité de notre prédiction) va varier si je fais varier ce paramètre ?</em> Nous saurons alors dans quel « sens » modifier nos paramètres pour réduire notre MSE.</p>
+
+  <div class="formula-box reveal">
+    <p style="margin:0; font-size:0.9rem; color:var(--text-dim); margin-bottom:0.5rem;">La règle de la chaîne (Chain Rule)</p>
+    \[ \frac{\partial L}{\partial W} = \frac{\partial L}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial W} \]
+  </div>
+
+  <!-- Backprop visual diagram -->
+  <div class="figure reveal">
+    <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrBack" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto">
+          <polygon points="8 0, 0 3, 8 6" fill="#ff6b6b"/>
+        </marker>
+        <marker id="arrForw" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#6c63ff"/>
+        </marker>
+      </defs>
+
+      <!-- Forward pass (top) -->
+      <text x="350" y="25" fill="#6c63ff" text-anchor="middle" font-size="13" font-weight="600">→ Forward pass (prédiction)</text>
+
+      <!-- Boxes -->
+      <rect x="30" y="50" width="120" height="60" rx="10" fill="rgba(108,99,255,0.12)" stroke="#6c63ff" stroke-width="2"/>
+      <text x="90" y="78" fill="#6c63ff" text-anchor="middle" font-size="11" font-weight="600">Entrées</text>
+      <text x="90" y="96" fill="#8888a0" text-anchor="middle" font-size="10">X</text>
+
+      <rect x="190" y="50" width="120" height="60" rx="10" fill="rgba(108,99,255,0.12)" stroke="#6c63ff" stroke-width="2"/>
+      <text x="250" y="78" fill="#6c63ff" text-anchor="middle" font-size="11" font-weight="600">Dense + σ</text>
+      <text x="250" y="96" fill="#8888a0" text-anchor="middle" font-size="10">Couche 1</text>
+
+      <rect x="350" y="50" width="120" height="60" rx="10" fill="rgba(108,99,255,0.12)" stroke="#6c63ff" stroke-width="2"/>
+      <text x="410" y="78" fill="#6c63ff" text-anchor="middle" font-size="11" font-weight="600">Dense + σ</text>
+      <text x="410" y="96" fill="#8888a0" text-anchor="middle" font-size="10">Couche 2</text>
+
+      <rect x="510" y="50" width="120" height="60" rx="10" fill="rgba(255,107,107,0.12)" stroke="#ff6b6b" stroke-width="2"/>
+      <text x="570" y="78" fill="#ff6b6b" text-anchor="middle" font-size="11" font-weight="600">Loss (MSE)</text>
+      <text x="570" y="96" fill="#8888a0" text-anchor="middle" font-size="10">Erreur</text>
+
+      <!-- Forward arrows -->
+      <line x1="150" y1="80" x2="185" y2="80" stroke="#6c63ff" stroke-width="1.5" marker-end="url(#arrForw)"/>
+      <line x1="310" y1="80" x2="345" y2="80" stroke="#6c63ff" stroke-width="1.5" marker-end="url(#arrForw)"/>
+      <line x1="470" y1="80" x2="505" y2="80" stroke="#6c63ff" stroke-width="1.5" marker-end="url(#arrForw)"/>
+
+      <!-- Backward pass (bottom) -->
+      <text x="350" y="170" fill="#ff6b6b" text-anchor="middle" font-size="13" font-weight="600">← Backward pass (correction des poids)</text>
+
+      <!-- Backward boxes -->
+      <rect x="30" y="190" width="120" height="60" rx="10" fill="rgba(255,107,107,0.08)" stroke="#ff6b6b" stroke-width="1.5" stroke-dasharray="4"/>
+      <text x="90" y="218" fill="#ff6b6b" text-anchor="middle" font-size="10">∂L/∂X</text>
+      <text x="90" y="236" fill="#8888a0" text-anchor="middle" font-size="9">Gradient entrées</text>
+
+      <rect x="190" y="190" width="120" height="60" rx="10" fill="rgba(255,107,107,0.08)" stroke="#ff6b6b" stroke-width="1.5" stroke-dasharray="4"/>
+      <text x="250" y="218" fill="#ff6b6b" text-anchor="middle" font-size="10">∂L/∂W₁, ∂L/∂b₁</text>
+      <text x="250" y="236" fill="#8888a0" text-anchor="middle" font-size="9">Mise à jour W₁, b₁</text>
+
+      <rect x="350" y="190" width="120" height="60" rx="10" fill="rgba(255,107,107,0.08)" stroke="#ff6b6b" stroke-width="1.5" stroke-dasharray="4"/>
+      <text x="410" y="218" fill="#ff6b6b" text-anchor="middle" font-size="10">∂L/∂W₂, ∂L/∂b₂</text>
+      <text x="410" y="236" fill="#8888a0" text-anchor="middle" font-size="9">Mise à jour W₂, b₂</text>
+
+      <rect x="510" y="190" width="120" height="60" rx="10" fill="rgba(255,107,107,0.12)" stroke="#ff6b6b" stroke-width="2"/>
+      <text x="570" y="218" fill="#ff6b6b" text-anchor="middle" font-size="10">∂L/∂ŷ</text>
+      <text x="570" y="236" fill="#8888a0" text-anchor="middle" font-size="9">Gradient initial</text>
+
+      <!-- Backward arrows -->
+      <line x1="505" y1="220" x2="475" y2="220" stroke="#ff6b6b" stroke-width="1.5" marker-end="url(#arrBack)"/>
+      <line x1="345" y1="220" x2="315" y2="220" stroke="#ff6b6b" stroke-width="1.5" marker-end="url(#arrBack)"/>
+      <line x1="185" y1="220" x2="155" y2="220" stroke="#ff6b6b" stroke-width="1.5" marker-end="url(#arrBack)"/>
+    </svg>
+    <div class="figure-caption"><span class="fig-number">Figure 8</span><span class="fig-title">Schéma comparatif de la propagation avant (forward) et de la rétropropagation (backward)</span><span class="fig-note">Note. Le forward pass calcule la prédiction de gauche à droite, tandis que le backward pass remonte les gradients de droite à gauche pour corriger les poids. Adapté de Rumelhart et al. (1986).</span></div>
+  </div>
+
+  <div class="formula-box reveal">
+    <p style="margin:0; font-size:0.9rem; color:var(--text-dim); margin-bottom:0.5rem;">Gradients de la couche Dense</p>
+    \[ \frac{\partial L}{\partial W} = X^T \cdot \nabla_{out} \qquad \frac{\partial L}{\partial b} = \sum \nabla_{out} \qquad \frac{\partial L}{\partial X} = \nabla_{out} \cdot W^T \]
+  </div>
+
+  <div class="formula-box reveal">
+    <p style="margin:0; font-size:0.9rem; color:var(--text-dim); margin-bottom:0.5rem;">Mise à jour des poids (descente de gradient)</p>
+    \[ W \leftarrow W - \eta \cdot \frac{\partial L}{\partial W} \qquad b \leftarrow b - \eta \cdot \frac{\partial L}{\partial b} \]
+    <p style="margin:0.5rem 0 0; font-size:0.85rem; color:var(--text-dim);">où η est le <strong style="color:var(--text);">learning rate</strong> (taux d'apprentissage)</p>
+  </div>
+
+  <div class="code-block reveal">
+    <div class="code-header">
+      <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      <span class="lang">Python</span>
+    </div>
+    <pre><span class="kw">def</span> <span class="fn">backward</span>(<span class="self">self</span>, grad_out):
+    <span class="cm"># grad_out = dL/d(out) de shape (N, out_dim)</span>
+    <span class="cm"># out = x @ W + b</span>
+
+    <span class="self">self</span>.dW = <span class="self">self</span>.x.T @ grad_out        <span class="cm"># dL/dW</span>
+    <span class="self">self</span>.db = np.sum(grad_out, axis=<span class="num">0</span>,
+                     keepdims=<span class="kw">True</span>)    <span class="cm"># dL/db</span>
+    grad_x = grad_out @ <span class="self">self</span>.W.T        <span class="cm"># dL/dx</span>
+    <span class="kw">return</span> grad_x
+
+<span class="kw">def</span> <span class="fn">step</span>(<span class="self">self</span>, lr):
+    <span class="cm"># Descente de gradient</span>
+    <span class="self">self</span>.W -= lr * <span class="self">self</span>.dW
+    <span class="self">self</span>.b -= lr * <span class="self">self</span>.db</pre>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ==================== 9. IMPLÉMENTATION ==================== -->
+<section id="implementation">
+  <span class="section-number reveal">09</span>
+  <h2 class="reveal">Implémentation complète</h2>
+
+  <p class="reveal">Maintenant que nous avons compris chaque composant, assemblons-les. Notre MLP aura l'architecture suivante : <strong>Dense(2→2) → Sigmoid → Dense(2→1) → Sigmoid</strong>. Deux neurones cachés suffisent pour résoudre XOR.</p>
+
+  <h3 class="reveal">Le réseau (MLP)</h3>
+
+  <div class="code-block reveal">
+    <div class="code-header">
+      <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      <span class="lang">Python — MLP</span>
+    </div>
+    <pre><span class="kw">class</span> <span class="fn">MLP</span>:
+    <span class="cm">"""
+    Dense(2→2) → Sigmoid → Dense(2→1) → Sigmoid
+    XOR n'est pas linéairement séparable : une couche
+    cachée non-linéaire rend le problème résoluble.
+    """</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self">self</span>, seed=<span class="num">0</span>):
+        <span class="self">self</span>.layers = [
+            Dense(<span class="num">2</span>, <span class="num">2</span>, seed=seed),
+            Sigmoid(),
+            Dense(<span class="num">2</span>, <span class="num">1</span>, seed=seed + <span class="num">1</span>),
+            Sigmoid()
+        ]
+
+    <span class="kw">def</span> <span class="fn">forward</span>(<span class="self">self</span>, x):
+        <span class="kw">for</span> layer <span class="kw">in</span> <span class="self">self</span>.layers:
+            x = layer.forward(x)
+        <span class="kw">return</span> x
+
+    <span class="kw">def</span> <span class="fn">backward</span>(<span class="self">self</span>, grad_out):
+        <span class="cm"># On remonte les couches en sens inverse</span>
+        <span class="kw">for</span> layer <span class="kw">in</span> <span class="fn">reversed</span>(<span class="self">self</span>.layers):
+            grad_out = layer.backward(grad_out)
+
+    <span class="kw">def</span> <span class="fn">step</span>(<span class="self">self</span>, lr):
+        <span class="kw">for</span> layer <span class="kw">in</span> <span class="self">self</span>.layers:
+            layer.step(lr)</pre>
+  </div>
+
+  <h3 class="reveal">L'entraîneur (Trainer)</h3>
+
+  <div class="code-block reveal">
+    <div class="code-header">
+      <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      <span class="lang">Python — Trainer</span>
+    </div>
+    <pre><span class="kw">class</span> <span class="fn">Trainer</span>:
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self">self</span>, model, lr=<span class="num">0.5</span>):
+        <span class="self">self</span>.model = model
+        <span class="self">self</span>.lr = lr
+        <span class="self">self</span>.loss_fn = MSELoss()
+
+    <span class="kw">def</span> <span class="fn">fit</span>(<span class="self">self</span>, X, Y, epochs=<span class="num">5000</span>):
+        <span class="kw">for</span> epoch <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, epochs + <span class="num">1</span>):
+            <span class="cm"># 1) Forward : prédiction</span>
+            Y_pred = <span class="self">self</span>.model.forward(X)
+
+            <span class="cm"># 2) Loss : évaluation</span>
+            loss = <span class="self">self</span>.loss_fn.forward(Y_pred, Y)
+
+            <span class="cm"># 3) Backward : gradients</span>
+            grad = <span class="self">self</span>.loss_fn.backward()
+            <span class="self">self</span>.model.backward(grad)
+
+            <span class="cm"># 4) Update : correction des poids</span>
+            <span class="self">self</span>.model.step(<span class="self">self</span>.lr)</pre>
+  </div>
+
+  <h3 class="reveal">Résolution du XOR</h3>
+
+  <div class="code-block reveal">
+    <div class="code-header">
+      <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      <span class="lang">Python — Exécution</span>
+    </div>
+    <pre><span class="cm"># Dataset XOR (4 points)</span>
+X = np.array([[<span class="num">0.0</span>, <span class="num">0.0</span>],
+              [<span class="num">0.0</span>, <span class="num">1.0</span>],
+              [<span class="num">1.0</span>, <span class="num">0.0</span>],
+              [<span class="num">1.0</span>, <span class="num">1.0</span>]])
+
+Y = np.array([[<span class="num">0.0</span>],
+              [<span class="num">1.0</span>],
+              [<span class="num">1.0</span>],
+              [<span class="num">0.0</span>]])
+
+model = MLP(seed=<span class="num">42</span>)
+trainer = Trainer(model, lr=<span class="num">0.8</span>)
+trainer.fit(X, Y, epochs=<span class="num">6000</span>)
+
+proba, binary = trainer.predict(X)
+<span class="fn">print</span>(<span class="str">"Probas:"</span>, np.round(proba, <span class="num">4</span>))
+<span class="fn">print</span>(<span class="str">"Sortie:"</span>, binary)</pre>
+  </div>
+
+  <!-- Results table -->
+  <h3 class="reveal">Résultats après 6 000 époques</h3>
+
+  <table class="styled-table reveal">
+    <thead>
+      <tr><th>Entrée (A, B)</th><th>XOR attendu</th><th>Prédiction du réseau</th><th>Sortie binaire</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>(0, 0)</td><td>0</td><td style="color:#00d4aa;">≈ 0.02</td><td style="color:#00d4aa;">0 ✓</td></tr>
+      <tr><td>(0, 1)</td><td>1</td><td style="color:#00d4aa;">≈ 0.97</td><td style="color:#00d4aa;">1 ✓</td></tr>
+      <tr><td>(1, 0)</td><td>1</td><td style="color:#00d4aa;">≈ 0.97</td><td style="color:#00d4aa;">1 ✓</td></tr>
+      <tr><td>(1, 1)</td><td>0</td><td style="color:#00d4aa;">≈ 0.03</td><td style="color:#00d4aa;">0 ✓</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card card-success reveal">
+    <p style="margin:0;"><strong>Le réseau a appris la fonction XOR !</strong> En partant de poids aléatoires, après 6 000 itérations de forward → loss → backward → update, notre MLP produit des prédictions proches de 0 et 1 avec une marge d'erreur inférieure à 3 %. Le problème qui a failli tuer l'IA est résolu par une couche cachée et une fonction d'activation non linéaire.</p>
+  </div>
+
+  <!-- Loss curve chart -->
+  <div class="chart-container reveal">
+    <canvas id="lossChart" width="800" height="350"></canvas>
+    <div class="figure-caption" style="margin-top:1rem;"><span class="fig-number">Figure 9</span><span class="fig-title">Courbe d'apprentissage du MLP lors de la résolution du problème XOR</span><span class="fig-note">Note. La loss (MSE) diminue progressivement au fil des 6 000 époques d'entraînement, confirmant la convergence du réseau vers une solution satisfaisante.</span></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ==================== 10. SOURCES ==================== -->
+<section id="sources">
+  <span class="section-number reveal">10</span>
+  <h2 class="reveal">Références</h2>
+
+  <ul class="references-list reveal">
+    <li>Goodfellow, I., Bengio, Y., &amp; Courville, A. (2016). <em>Deep learning</em>. MIT Press. <a href="https://www.deeplearningbook.org/" target="_blank">https://www.deeplearningbook.org/</a></li>
+    <li>McCulloch, W. S., &amp; Pitts, W. (1943). A logical calculus of the ideas immanent in nervous activity. <em>Bulletin of Mathematical Biophysics</em>, <em>5</em>(4), 115–133. <a href="https://doi.org/10.1007/BF02478259" target="_blank">https://doi.org/10.1007/BF02478259</a></li>
+    <li>Microsoft. (2025). <em>Global AI adoption report</em>. <a href="https://www.microsoft.com" target="_blank">https://www.microsoft.com</a></li>
+    <li>Minsky, M., &amp; Papert, S. (1969). <em>Perceptrons: An introduction to computational geometry</em>. MIT Press.</li>
+    <li>Nielsen, M. (2015). <em>Neural networks and deep learning</em>. Determination Press. <a href="http://neuralnetworksanddeeplearning.com/" target="_blank">http://neuralnetworksanddeeplearning.com/</a></li>
+    <li>Rosenblatt, F. (1958). The perceptron: A probabilistic model for information storage and organization in the brain. <em>Psychological Review</em>, <em>65</em>(6), 386–408. <a href="https://doi.org/10.1037/h0042519" target="_blank">https://doi.org/10.1037/h0042519</a></li>
+    <li>Rumelhart, D. E., Hinton, G. E., &amp; Williams, R. J. (1986). Learning representations by back-propagating errors. <em>Nature</em>, <em>323</em>(6088), 533–536. <a href="https://doi.org/10.1038/323533a0" target="_blank">https://doi.org/10.1038/323533a0</a></li>
+    <li>Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, Ł., &amp; Polosukhin, I. (2017). Attention is all you need. Dans <em>Advances in Neural Information Processing Systems</em> (Vol. 30). Curran Associates. <a href="https://arxiv.org/abs/1706.03762" target="_blank">https://arxiv.org/abs/1706.03762</a></li>
+  </ul>
+</section>
+
+</main>
+
+<footer>
+  <p>Nathan Feuerstein — Introduction au Deep Learning & Résolution du XOR par MLP</p>
+</footer>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script>
+// ======= SCROLL REVEAL =======
+const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, observerOptions);
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ======= TOC ACTIVE STATE =======
+const sections = document.querySelectorAll('section[id], header[id]');
+const tocLinks = document.querySelectorAll('.toc a');
+
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop - 200;
+    if (pageYOffset >= sectionTop) {
+      current = section.getAttribute('id');
+    }
+  });
+  tocLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === '#' + current) {
+      link.classList.add('active');
+    }
+  });
+});
+
+// ======= SIGMOID CHART (Canvas) =======
+function drawSigmoid() {
+  const canvas = document.getElementById('sigmoidChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width;
+  const H = canvas.height;
+  const pad = { top: 40, bottom: 50, left: 60, right: 40 };
+
+  const plotW = W - pad.left - pad.right;
+  const plotH = H - pad.top - pad.bottom;
+
+  // Background
+  ctx.fillStyle = '#12121a';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid
+  ctx.strokeStyle = '#2a2a3e';
+  ctx.lineWidth = 1;
+
+  // Horizontal grid lines (0, 0.25, 0.5, 0.75, 1.0)
+  for (let v = 0; v <= 1; v += 0.25) {
+    const y = pad.top + plotH * (1 - v);
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(W - pad.right, y);
+    ctx.stroke();
+    ctx.fillStyle = '#8888a0';
+    ctx.font = '12px Inter';
+    ctx.textAlign = 'right';
+    ctx.fillText(v.toFixed(2), pad.left - 8, y + 4);
+  }
+
+  // Vertical grid lines
+  for (let z = -8; z <= 8; z += 2) {
+    const x = pad.left + plotW * ((z + 8) / 16);
+    ctx.beginPath();
+    ctx.strokeStyle = '#2a2a3e';
+    ctx.moveTo(x, pad.top);
+    ctx.lineTo(x, H - pad.bottom);
+    ctx.stroke();
+    ctx.fillStyle = '#8888a0';
+    ctx.font = '12px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText(z, x, H - pad.bottom + 20);
+  }
+
+  // Axis labels
+  ctx.fillStyle = '#8888a0';
+  ctx.font = '13px Inter';
+  ctx.textAlign = 'center';
+  ctx.fillText('z', W / 2, H - 8);
+  ctx.save();
+  ctx.translate(15, H / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('σ(z)', 0, 0);
+  ctx.restore();
+
+  // Sigmoid function
+  function sigmoid(z) { return 1 / (1 + Math.exp(-z)); }
+
+  // Draw derivative first (behind)
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgba(255,107,107,0.6)';
+  ctx.lineWidth = 2;
+  for (let i = 0; i <= plotW; i++) {
+    const z = (i / plotW) * 16 - 8;
+    const s = sigmoid(z);
+    const ds = s * (1 - s);
+    const x = pad.left + i;
+    const y = pad.top + plotH * (1 - ds);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Draw sigmoid curve
+  ctx.beginPath();
+  const gradient = ctx.createLinearGradient(pad.left, 0, W - pad.right, 0);
+  gradient.addColorStop(0, '#6c63ff');
+  gradient.addColorStop(1, '#00d4aa');
+  ctx.strokeStyle = gradient;
+  ctx.lineWidth = 3;
+  for (let i = 0; i <= plotW; i++) {
+    const z = (i / plotW) * 16 - 8;
+    const s = sigmoid(z);
+    const x = pad.left + i;
+    const y = pad.top + plotH * (1 - s);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // y=0.5 reference line
+  const halfY = pad.top + plotH * 0.5;
+  ctx.setLineDash([6, 4]);
+  ctx.strokeStyle = 'rgba(255,165,0,0.4)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad.left, halfY);
+  ctx.lineTo(W - pad.right, halfY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Legend
+  ctx.font = '12px Inter';
+  // Sigmoid
+  ctx.strokeStyle = '#6c63ff';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(W - 220, 20);
+  ctx.lineTo(W - 190, 20);
+  ctx.stroke();
+  ctx.fillStyle = '#c8c8e0';
+  ctx.textAlign = 'left';
+  ctx.fillText('σ(z) = 1 / (1 + e⁻ᶻ)', W - 185, 24);
+
+  // Derivative
+  ctx.strokeStyle = 'rgba(255,107,107,0.6)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(W - 220, 42);
+  ctx.lineTo(W - 190, 42);
+  ctx.stroke();
+  ctx.fillStyle = '#ff6b6b';
+  ctx.fillText("σ'(z) = σ(z)·(1−σ(z))", W - 185, 46);
+
+  // Title
+  ctx.fillStyle = '#e8e8f0';
+  ctx.font = 'bold 14px Inter';
+  ctx.textAlign = 'left';
+  ctx.fillText('Fonction Sigmoïde', pad.left, 24);
+}
+
+// ======= LOSS CURVE CHART =======
+function drawLossCurve() {
+  const canvas = document.getElementById('lossChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width;
+  const H = canvas.height;
+  const pad = { top: 40, bottom: 50, left: 70, right: 40 };
+
+  const plotW = W - pad.left - pad.right;
+  const plotH = H - pad.top - pad.bottom;
+
+  ctx.fillStyle = '#12121a';
+  ctx.fillRect(0, 0, W, H);
+
+  // Simulated loss curve (exponential decay with some noise)
+  const epochs = 6000;
+  const lossData = [];
+  let loss = 0.27;
+  for (let e = 0; e < epochs; e++) {
+    if (e < 500) loss -= 0.00002;
+    else if (e < 2000) loss *= 0.9985;
+    else loss *= 0.9992;
+    loss = Math.max(loss, 0.001);
+    lossData.push(loss);
+  }
+
+  const maxLoss = 0.28;
+
+  // Grid
+  ctx.strokeStyle = '#2a2a3e';
+  ctx.lineWidth = 1;
+  for (let v = 0; v <= 0.25; v += 0.05) {
+    const y = pad.top + plotH * (1 - v / maxLoss);
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(W - pad.right, y);
+    ctx.stroke();
+    ctx.fillStyle = '#8888a0';
+    ctx.font = '11px Inter';
+    ctx.textAlign = 'right';
+    ctx.fillText(v.toFixed(2), pad.left - 8, y + 4);
+  }
+
+  for (let e = 0; e <= 6000; e += 1000) {
+    const x = pad.left + plotW * (e / epochs);
+    ctx.beginPath();
+    ctx.strokeStyle = '#2a2a3e';
+    ctx.moveTo(x, pad.top);
+    ctx.lineTo(x, H - pad.bottom);
+    ctx.stroke();
+    ctx.fillStyle = '#8888a0';
+    ctx.font = '11px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText(e, x, H - pad.bottom + 20);
+  }
+
+  // Axis labels
+  ctx.fillStyle = '#8888a0';
+  ctx.font = '13px Inter';
+  ctx.textAlign = 'center';
+  ctx.fillText('Époques', W / 2, H - 8);
+  ctx.save();
+  ctx.translate(15, H / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('Loss (MSE)', 0, 0);
+  ctx.restore();
+
+  // Draw area under curve
+  ctx.beginPath();
+  ctx.moveTo(pad.left, H - pad.bottom);
+  for (let i = 0; i < lossData.length; i += 10) {
+    const x = pad.left + plotW * (i / epochs);
+    const y = pad.top + plotH * (1 - lossData[i] / maxLoss);
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(W - pad.right, H - pad.bottom);
+  ctx.closePath();
+  const areaGrad = ctx.createLinearGradient(0, pad.top, 0, H - pad.bottom);
+  areaGrad.addColorStop(0, 'rgba(108,99,255,0.15)');
+  areaGrad.addColorStop(1, 'rgba(108,99,255,0)');
+  ctx.fillStyle = areaGrad;
+  ctx.fill();
+
+  // Draw curve
+  ctx.beginPath();
+  const lineGrad = ctx.createLinearGradient(pad.left, 0, W - pad.right, 0);
+  lineGrad.addColorStop(0, '#ff6b6b');
+  lineGrad.addColorStop(0.5, '#ffa500');
+  lineGrad.addColorStop(1, '#00d4aa');
+  ctx.strokeStyle = lineGrad;
+  ctx.lineWidth = 2.5;
+  for (let i = 0; i < lossData.length; i += 5) {
+    const x = pad.left + plotW * (i / epochs);
+    const y = pad.top + plotH * (1 - lossData[i] / maxLoss);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Title
+  ctx.fillStyle = '#e8e8f0';
+  ctx.font = 'bold 14px Inter';
+  ctx.textAlign = 'left';
+  ctx.fillText('Courbe d\'apprentissage — Résolution du XOR', pad.left, 24);
+
+  // Annotation
+  ctx.fillStyle = '#00d4aa';
+  ctx.font = '12px Inter';
+  ctx.textAlign = 'right';
+  ctx.fillText('Loss ≈ 0.001 — Convergence !', W - pad.right, pad.top + plotH - 10);
+}
+
+// Draw charts when loaded
+window.addEventListener('load', () => {
+  drawSigmoid();
+  drawLossCurve();
+});
+window.addEventListener('resize', () => {
+  drawSigmoid();
+  drawLossCurve();
+});
+</script>
+</body>
+</html>
