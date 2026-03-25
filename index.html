@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Introduction au Deep Learning — Construire un MLP de zéro pour résoudre XOR</title>
+<title>Introduction au Deep Learning  Construire un MLP de zéro pour résoudre XOR</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" crossorigin="anonymous" async></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:wght@400;600;700;800&display=swap');
@@ -591,7 +591,7 @@
   <div class="hero-content">
     <span class="hero-badge">Réseau de Neurones Artificiels</span>
     <h1>Introduction au<br><span class="gradient-text">Deep Learning</span></h1>
-    <p class="subtitle">Construire un Perceptron Multicouche de zéro pour résoudre le problème historique du XOR — le défi qui a failli tuer l'intelligence artificielle.</p>
+    <p class="subtitle">Construire un Perceptron Multicouche de zéro pour résoudre le premier problème historique de l'IA, implémenter la fonction XOR. Le défi qui a failli tuer l'intelligence artificielle.</p>
     <p class="author">Par <strong>Nathan Feuerstein</strong></p>
   </div>
   <div class="scroll-indicator">&#8595;</div>
@@ -651,7 +651,7 @@
   <span class="section-number reveal">02</span>
   <h2 class="reveal">Contexte historique</h2>
 
-  <p class="reveal">L'histoire des réseaux de neurones artificiels commence dans les <strong>années 1940</strong>, lorsque les neurophysiologistes <strong>Warren McCulloch</strong> et <strong>Walter Pitts</strong> proposent le premier modèle mathématique formel d'un neurone artificiel. L'idée est révolutionnaire : imiter le fonctionnement du cerveau humain à l'aide de mathématiques et d'électronique.</p>
+  <p class="reveal">L'histoire des réseaux de neurones artificiels commence dans les <strong>années 1940</strong>, lorsque les neurophysiologistes <strong>Warren McCulloch</strong> et <strong>Walter Pitts</strong> proposent le premier modèle mathématique formel d'un neurone artificiel. L'idée est révolutionnaire : simuler le fonctionnement du cerveau humain à l'aide de mathématiques et d'électronique. </p>
 
   <!-- Timeline SVG -->
   <div class="figure reveal">
@@ -703,15 +703,15 @@
     <div class="figure-caption"><span class="fig-number">Figure 1</span><span class="fig-title">Frise chronologique des grandes étapes du Deep Learning (1943–2017)</span></div>
   </div>
 
-  <p class="reveal">En <strong>1958</strong>, <strong>Frank Rosenblatt</strong> invente le Perceptron multicouche — le premier ancêtre direct de nos réseaux modernes. Ce modèle apprend à classer des données en ajustant des poids numériques, un peu comme un enfant qui apprend par essais et erreurs. L'enthousiasme est immense : on imagine déjà des machines capables de reconnaître des objets, de comprendre le langage, de prendre des décisions.</p>
+  <p class="reveal">En <strong>1958</strong>, <strong>Frank Rosenblatt</strong> invente le Perceptron multicouche:    le premier ancêtre direct de nos réseaux modernes. Ce modèle apprend à classer des données en ajustant des poids numériques, un peu comme un enfant qui apprend par essais et erreurs. L'enthousiasme est immense : on imagine déjà des machines capables de reconnaître des objets, de comprendre le langage, de prendre des décisions.</p>
 
   <p class="reveal">Mais en <strong>1969</strong>, les mathématiciens <strong>Marvin Minsky</strong> et <strong>Seymour Papert</strong> publient un livre dévastateur : ils démontrent que le perceptron simple est fondamentalement incapable de résoudre certains problèmes de base, dont la fonction <strong>XOR</strong>.</p>
 
   <div class="card card-warning reveal">
-    <p style="margin:0;"><strong>Le problème XOR :</strong> La fonction XOR est non linéaire. Les neurones artificiels sont des fonctions linéaires. Il est impossible pour une fonction linéaire, aussi complexe soit-elle, d'approximer une fonction non linéaire. Cela signifiait que l'IA n'était capable de résoudre qu'un nombre très limité de tâches… C'est le premier grand <strong>hiver de l'IA</strong> — une période de désillusion et de coupes budgétaires massives.</p>
+    <p style="margin:0;"><strong>Le problème XOR :</strong> La fonction XOR est non linéaire. Les neurones artificiels sont des fonctions linéaires. Il est impossible pour une fonction linéaire, aussi complexe soit-elle, d'approximer une fonction non linéaire. Cela signifiait que l'IA n'était capable de résoudre qu'un nombre très limité de tâches… C'est le premier grand <strong>hiver de l'IA</strong> , une période de désillusion générale et de coupes budgétaires massives.</p>
   </div>
 
-  <h3 class="reveal">La table de vérité du XOR</h3>
+  <h3 class="reveal">Les sorties possibles (table de vérité) de la fonction XOR</h3>
 
   <table class="styled-table reveal">
     <thead>
@@ -958,7 +958,7 @@
   <p class="reveal">Pour les plus attentifs, cela fait sûrement penser à la formule du <strong>produit scalaire</strong> ! En effet, la sortie d'un neurone (avant activation) est le produit scalaire de ses poids et de ses entrées, auquel on additionne un biais.</p>
 
   <div class="card reveal">
-    <p><strong>Analogie visuelle :</strong> Imaginez que les poids \(w_n\) soient la <em>pente</em> d'une droite, et le biais \(b\) le <em>point de départ</em> de cette droite. En faisant varier ces deux informations, on peut dessiner n'importe quelle droite. Remarque : on ne peut dessiner <em>que</em> des droites — c'est exactement pour ça qu'on a eu un premier « hiver » de l'IA à cause de la fonction XOR, qui n'est justement pas une droite.</p>
+    <p><strong>Analogie visuelle :</strong> Imaginez que les poids \(w_n\) soient la <em>pente</em> d'une droite, et le biais \(b\) le <em>point de départ</em> de cette droite. En faisant varier ces deux informations, on peut dessiner n'importe quelle droite. Remarque : on ne peut dessiner <em>que</em> des droites,  c'est exactement pour ça qu'on a eu un premier « hiver » de l'IA à cause de la fonction XOR, qui n'est justement pas une droite.</p>
   </div>
 
   <div class="formula-box reveal">
@@ -1059,7 +1059,7 @@
     <div class="figure-caption"><span class="fig-number">Figure 5</span><span class="fig-title">Architecture d'un perceptron multicouche (MLP) pour la résolution du problème XOR</span><span class="fig-note">Note. Le réseau comporte une couche d'entrée (2 neurones), une couche cachée (3 neurones pour l'illustration) et une couche de sortie (1 neurone). Les connexions représentent les poids synaptiques.</span></div>
   </div>
 
-  <p class="reveal">C'est bien pour cela qu'au début, les poids et biais sont générés <strong>aléatoirement</strong>. Car sinon, tous les neurones auraient la même sortie, et le réseau les corrigerait tous de la même manière — autant n'en avoir qu'un seul par couche, ce qui serait bien moins efficace.</p>
+  <p class="reveal">C'est bien pour cela qu'au début de l'entrainement, les poids et biais sont générés <strong>aléatoirement</strong>. Car sinon, tous les neurones auraient la même sortie, et le réseau les corrigerait tous de la même manière — autant n'en avoir qu'un seul par couche, ce qui serait bien moins efficace.</p>
 
   <p class="reveal">Chaque neurone possède un biais et des poids qui lui sont propres. Il est important que <strong>le nombre de poids soit égal au nombre d'entrées</strong> : la dimension du vecteur \(\mathbf{X}\) doit être égale à la dimension du vecteur \(\mathbf{W}\).</p>
 
@@ -1117,7 +1117,7 @@
 
   <h3 class="reveal">La fonction Sigmoïde</h3>
 
-  <p class="reveal">Dans notre cas, nous allons utiliser la fonction <strong>Sigmoïde</strong> car elle se dérive facilement (vous verrez plus tard pourquoi c'est utile) et donne en sortie une valeur entre 0 et 1 — parfait pour une probabilité !</p>
+  <p class="reveal">Dans notre cas, nous allons utiliser la fonction <strong>Sigmoïde</strong> car elle se dérive facilement (vous verrez plus tard pourquoi c'est utile) et donne en sortie une valeur entre 0 et 1. Le format et ordre de grandeur arfait pour un calcul de probabilité ! (une probabilité est toujours comprise entre 0 et 1) </p>
 
   <div class="formula-box reveal">
     <p style="margin:0; font-size:0.9rem; color:var(--text-dim); margin-bottom:0.5rem;">Fonction Sigmoïde et sa dérivée</p>
@@ -1155,7 +1155,7 @@
   <span class="section-number reveal">07</span>
   <h2 class="reveal">Auto-évaluation : la Loss Function</h2>
 
-  <p class="reveal">Lorsqu'on entraîne un réseau de neurones pour une tâche spécifique, nous savons quel résultat nous voulons obtenir. Pour cela, nous avons besoin de <strong>données d'entraînement</strong> — des données qui correspondent à ce que l'on veut que notre IA prédise.</p>
+  <p class="reveal">Lorsqu'on entraîne un réseau de neurones pour une tâche spécifique, nous savons quel résultat nous voulons obtenir. Pour cela, nous avons besoin de <strong>données d'entraînement</strong>  des données qui correspondent à ce que l'on veut que notre IA prédise.</p>
 
   <p class="reveal">Par exemple, si on entraîne une IA qui doit prédire le nombre de boîtes de LEGO vendues à Chicago l'année prochaine, nous avons besoin des données de ventes des dernières années. Plus nous aurons de données pertinentes, plus notre modèle pourra apprendre et ajuster ses paramètres pour devenir performant.</p>
 
@@ -1223,7 +1223,7 @@
   <span class="section-number reveal">08</span>
   <h2 class="reveal">Auto-correction : la Backpropagation</h2>
 
-  <p class="reveal">Vous seriez légitime de vous demander : « Je sais à quel point mon réseau est mauvais, maintenant comment savoir comment l'améliorer ? ». C'est exactement le rôle de la <strong>rétropropagation du gradient</strong>.</p>
+  <p class="reveal">Vous seriez légitime de vous demander : « Je sais à quel point mon réseau est mauvais, maintenant comment l'améliorer ? ». C'est exactement le rôle de la <strong>rétropropagation du gradient</strong>, l'actualisation des paramètres donc l'amélioration du réseau.</p>
 
   <p class="reveal">Ce qui fait la spécificité et la performance d'un réseau de neurones, ce sont ses paramètres. C'est en modifiant soigneusement les valeurs des paramètres qu'on améliore un RNA. Certains RNA contiennent des millions, voire des milliards de paramètres. Pour savoir lesquels ajuster et de combien, nous utilisons un outil créé par Isaac Newton : <strong>le calcul différentiel</strong>.</p>
 
