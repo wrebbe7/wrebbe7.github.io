@@ -751,7 +751,7 @@
       <text x="42" y="65" fill="#8888a0" text-anchor="middle" font-size="11">1</text>
 
       <!-- Impossible line -->
-      <text x="210" y="15" fill="#ff6b6b" text-anchor="middle" font-size="11" opacity="0.8">Impossible de séparer avec une seule droite !</text>
+      <text x="210" y="15" fill="#ff6b6b" text-anchor="middle" font-size="11" opacity="0.8">Impossible de rassembler les 0 et les 1 avec une seule droite !</text>
 
       <!-- Dashed attempt line -->
       <line x1="60" y1="30" x2="360" y2="330" stroke="#ff6b6b" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.4"/>
@@ -797,7 +797,7 @@
   <p class="reveal">Ces architectures mathématiques ont la particularité de pouvoir <strong>s'auto-évaluer</strong>, et de <strong>s'améliorer</strong> grâce à des données. C'est ce qu'on appelle communément l'apprentissage machine (Machine Learning).</p>
 
   <div class="card reveal">
-    <p><strong>Les paramètres</strong> — Un paramètre est un nombre. Ce qui rend un réseau différent d'un autre, ce sont les <em>valeurs</em> et la <em>quantité</em> de ses paramètres. Ce sont ses paramètres qui déterminent exactement comment l'entrée est transformée en sortie. Plus un RNA a de neurones, plus il a de paramètres, car il y aura davantage de liens entre les neurones.</p>
+    <p><strong>Les paramètres</strong>  Un paramètre est un nombre. Ce qui rend un réseau différent d'un autre, ce sont les <em>valeurs</em> et la <em>quantité</em> de ses paramètres. Ce sont ses paramètres qui déterminent exactement comment l'entrée est transformée en sortie. Plus un RNA a de neurones, plus il a de paramètres, car il y aura davantage de liens entre les neurones.</p>
     <p style="margin:0;">Le but est donc de trouver les valeurs des paramètres qui permettent au réseau de faire les <strong>meilleures prédictions possibles</strong>.</p>
   </div>
 
@@ -874,6 +874,7 @@
   <p class="reveal">Un neurone est une <strong>fonction mathématique à n variables</strong>. Il reçoit un nombre n d'entrées et produit une valeur en sortie. Par exemple, pour n = 3, les entrées peuvent être 2, 3 et 0.00001, et la sortie 42.</p>
 
   <p class="reveal">Un neurone possède les caractéristiques suivantes : pour chaque entrée \(x_n\), il possède un <strong>poids</strong> \(w_n\) qui lui est associé, ainsi qu'un <strong>biais</strong> \(b\) (un nombre stocké dans la « mémoire » du neurone).</p>
+  <p class="reveal"> Lorsque un neurone s'active (feedforward), il  <strong> multiplie la valeur de chacune de ses entrées avec chacun des poids associé à chaque entrée <strong>, et à la fin  <strong>additionne le biais. <strong> </p>
 
   <!-- NEURONE DIAGRAM -->
   <div class="figure reveal">
