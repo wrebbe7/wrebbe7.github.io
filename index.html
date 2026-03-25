@@ -631,7 +631,7 @@
     <p style="margin:0;"><strong>Le saviez-vous ?</strong> Selon un rapport de Microsoft, en 2025, <strong>35 % des entreprises</strong> utilisent déjà l'IA quotidiennement dans leurs opérations. Environ <strong>1,5 milliard de personnes</strong> utilisent des outils d'IA générative au quotidien. <em>(Global AI Adoption, 2025)</em></p>
   </div>
 
-  <p class="reveal">Les ingénieurs qui développent de nouveaux outils d'IA utilisent bien souvent des bibliothèques spécialisées (PyTorch, TensorFlow…). Cela veut dire qu'ils utilisent des outils d'IA qui existent déjà, sans avoir besoin de les recréer de zéro — et donc ne ressentent pas toujours le besoin de comprendre leur fonctionnement réel.</p>
+  <p class="reveal">Les ingénieurs qui développent de nouveaux outils d'IA utilisent bien souvent des bibliothèques spécialisées (PyTorch, TensorFlow…). Cela veut dire qu'ils utilisent des outils d'IA qui existent déjà, sans avoir besoin de les recréer de zéro, et donc ne ressentent pas toujours le besoin de comprendre leur fonctionnement réel.</p>
 
   <p class="reveal">Par conséquent, peu de gens en dehors des chercheurs en intelligence artificielle s'intéressent vraiment au cœur du fonctionnement mathématique et algorithmique réel des réseaux de neurones artificiels.</p>
 
@@ -1060,7 +1060,7 @@
     <div class="figure-caption"><span class="fig-number">Figure 5</span><span class="fig-title">Architecture d'un perceptron multicouche (MLP) pour la résolution du problème XOR</span><span class="fig-note">Note. Le réseau comporte une couche d'entrée (2 neurones), une couche cachée (3 neurones pour l'illustration) et une couche de sortie (1 neurone). Les connexions représentent les poids synaptiques.</span></div>
   </div>
 
-  <p class="reveal">C'est bien pour cela qu'au début de l'entrainement, les poids et biais sont générés <strong>aléatoirement</strong>. Car sinon, tous les neurones auraient la même sortie, et le réseau les corrigerait tous de la même manière — autant n'en avoir qu'un seul par couche, ce qui serait bien moins efficace.</p>
+  <p class="reveal">C'est bien pour cela qu'au début de l'entrainement, les poids et biais sont générés <strong>aléatoirement</strong>. Car sinon, tous les neurones auraient la même sortie, et le réseau les corrigerait tous de la même manière ... C'est comme n'en avoir qu'un seul par couche. Ce serait évidemment  bien moins efficace.</p>
 
   <p class="reveal">Chaque neurone possède un biais et des poids qui lui sont propres. Il est important que <strong>le nombre de poids soit égal au nombre d'entrées</strong> : la dimension du vecteur \(\mathbf{X}\) doit être égale à la dimension du vecteur \(\mathbf{W}\).</p>
 
@@ -1233,6 +1233,7 @@
   </div>
 
   <p class="reveal">La dérivée partielle de la Loss par rapport à un paramètre nous dit : <em>à quel point la Loss (la qualité de notre prédiction) va varier si je fais varier ce paramètre ?</em> Nous saurons alors dans quel « sens » modifier nos paramètres pour réduire notre MSE.</p>
+  <p class="reveal">En appliquant la règle de la dérivée en chaine, on calculs les gradients de chaques couches en multipliant le gradient d'entrée par le vecteur X des entrées de la couche .</p>
 
   <div class="formula-box reveal">
     <p style="margin:0; font-size:0.9rem; color:var(--text-dim); margin-bottom:0.5rem;">La règle de la chaîne (Chain Rule)</p>
@@ -1441,7 +1442,7 @@ proba, binary = trainer.predict(X)
   </div>
 
   <!-- Results table -->
-  <h3 class="reveal">Résultats après 6 000 époques</h3>
+  <h3 class="reveal">Résultats après 6 000 itérations </h3>
 
   <table class="styled-table reveal">
     <thead>
