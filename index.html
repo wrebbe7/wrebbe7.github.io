@@ -264,7 +264,7 @@
     border: 1px solid var(--border);
     border-radius: 16px;
     padding: 2rem;
-    margin: 2.5rem 0;
+    margin: 2.5rem -3rem;
     text-align: center;
     overflow: hidden;
   }
@@ -540,6 +540,7 @@
     h2 { font-size: 1.8rem; }
     .container { padding: 0 1.2rem; }
     .section-number { font-size: 4rem; }
+    .figure { margin-left: -1.2rem; margin-right: -1.2rem; }
   }
 
   /* Pulse animation for neuron SVG */
@@ -656,46 +657,79 @@
   <!-- Timeline SVG -->
   <div class="figure reveal">
     <svg viewBox="0 0 800 220" xmlns="http://www.w3.org/2000/svg">
-      <!-- Ligne principale -->
-      <line x1="50" y1="110" x2="750" y2="110" stroke="#2a2a3e" stroke-width="3" stroke-linecap="round"/>
-      <!-- Gradient line overlay -->
       <defs>
+        <filter id="tglow" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="4" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
         <linearGradient id="timeGrad" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stop-color="#6c63ff"/>
           <stop offset="100%" stop-color="#00d4aa"/>
         </linearGradient>
+        <path id="tlPath" d="M 50,110 L 750,110"/>
       </defs>
-      <line x1="50" y1="110" x2="750" y2="110" stroke="url(#timeGrad)" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+
+      <!-- Timeline lines -->
+      <line x1="50" y1="110" x2="750" y2="110" stroke="#2a2a3e" stroke-width="3" stroke-linecap="round"/>
+      <line x1="50" y1="110" x2="750" y2="110" stroke="url(#timeGrad)" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+
+      <!-- Travelling particle -->
+      <circle r="6" fill="white" filter="url(#tglow)" opacity="0.85">
+        <animateMotion dur="6s" repeatCount="indefinite" begin="0s"><mpath href="#tlPath"/></animateMotion>
+      </circle>
+      <circle r="3" fill="white" opacity="0.5">
+        <animateMotion dur="6s" repeatCount="indefinite" begin="0.3s"><mpath href="#tlPath"/></animateMotion>
+      </circle>
 
       <!-- 1943 -->
-      <circle cx="100" cy="110" r="10" fill="#6c63ff"/>
+      <circle cx="100" cy="110" r="10" fill="none" stroke="#6c63ff" stroke-width="2">
+        <animate attributeName="r" values="10;24;10" dur="3s" repeatCount="indefinite" begin="0s"/>
+        <animate attributeName="opacity" values="0.8;0;0.8" dur="3s" repeatCount="indefinite" begin="0s"/>
+      </circle>
+      <circle cx="100" cy="110" r="10" fill="#6c63ff" filter="url(#tglow)"/>
       <text x="100" y="85" fill="#6c63ff" text-anchor="middle" font-size="13" font-weight="700">1943</text>
       <text x="100" y="150" fill="#c8c8e0" text-anchor="middle" font-size="10.5">McCulloch</text>
       <text x="100" y="165" fill="#c8c8e0" text-anchor="middle" font-size="10.5">&amp; Pitts</text>
       <text x="100" y="180" fill="#8888a0" text-anchor="middle" font-size="9">Neurone formel</text>
 
       <!-- 1958 -->
-      <circle cx="260" cy="110" r="10" fill="#00d4aa"/>
+      <circle cx="260" cy="110" r="10" fill="none" stroke="#00d4aa" stroke-width="2">
+        <animate attributeName="r" values="10;24;10" dur="3.6s" repeatCount="indefinite" begin="0.7s"/>
+        <animate attributeName="opacity" values="0.8;0;0.8" dur="3.6s" repeatCount="indefinite" begin="0.7s"/>
+      </circle>
+      <circle cx="260" cy="110" r="10" fill="#00d4aa" filter="url(#tglow)"/>
       <text x="260" y="85" fill="#00d4aa" text-anchor="middle" font-size="13" font-weight="700">1958</text>
       <text x="260" y="150" fill="#c8c8e0" text-anchor="middle" font-size="10.5">Rosenblatt</text>
       <text x="260" y="165" fill="#8888a0" text-anchor="middle" font-size="9">Perceptron</text>
 
       <!-- 1969 -->
-      <circle cx="400" cy="110" r="10" fill="#ff6b6b"/>
+      <circle cx="400" cy="110" r="10" fill="none" stroke="#ff6b6b" stroke-width="2">
+        <animate attributeName="r" values="10;24;10" dur="4s" repeatCount="indefinite" begin="1.4s"/>
+        <animate attributeName="opacity" values="0.8;0;0.8" dur="4s" repeatCount="indefinite" begin="1.4s"/>
+      </circle>
+      <circle cx="400" cy="110" r="10" fill="#ff6b6b" filter="url(#tglow)"/>
       <text x="400" y="85" fill="#ff6b6b" text-anchor="middle" font-size="13" font-weight="700">1969</text>
       <text x="400" y="150" fill="#c8c8e0" text-anchor="middle" font-size="10.5">Minsky &amp;</text>
       <text x="400" y="165" fill="#c8c8e0" text-anchor="middle" font-size="10.5">Papert</text>
       <text x="400" y="180" fill="#ff6b6b" text-anchor="middle" font-size="9">Hiver de l'IA</text>
 
       <!-- 1986 -->
-      <circle cx="550" cy="110" r="10" fill="#ffa500"/>
+      <circle cx="550" cy="110" r="10" fill="none" stroke="#ffa500" stroke-width="2">
+        <animate attributeName="r" values="10;24;10" dur="3.2s" repeatCount="indefinite" begin="2.1s"/>
+        <animate attributeName="opacity" values="0.8;0;0.8" dur="3.2s" repeatCount="indefinite" begin="2.1s"/>
+      </circle>
+      <circle cx="550" cy="110" r="10" fill="#ffa500" filter="url(#tglow)"/>
       <text x="550" y="85" fill="#ffa500" text-anchor="middle" font-size="13" font-weight="700">1986</text>
       <text x="550" y="150" fill="#c8c8e0" text-anchor="middle" font-size="10.5">Rumelhart,</text>
       <text x="550" y="165" fill="#c8c8e0" text-anchor="middle" font-size="10.5">Hinton, Williams</text>
       <text x="550" y="180" fill="#8888a0" text-anchor="middle" font-size="9">Backpropagation</text>
 
       <!-- 2017 -->
-      <circle cx="700" cy="110" r="10" fill="#e040fb"/>
+      <circle cx="700" cy="110" r="10" fill="none" stroke="#e040fb" stroke-width="2">
+        <animate attributeName="r" values="10;24;10" dur="3.8s" repeatCount="indefinite" begin="2.8s"/>
+        <animate attributeName="opacity" values="0.8;0;0.8" dur="3.8s" repeatCount="indefinite" begin="2.8s"/>
+      </circle>
+      <circle cx="700" cy="110" r="10" fill="#e040fb" filter="url(#tglow)"/>
       <text x="700" y="85" fill="#e040fb" text-anchor="middle" font-size="13" font-weight="700">2017</text>
       <text x="700" y="150" fill="#c8c8e0" text-anchor="middle" font-size="10.5">Google</text>
       <text x="700" y="165" fill="#8888a0" text-anchor="middle" font-size="9">Transformers</text>
@@ -729,6 +763,10 @@
   <div class="figure reveal">
     <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
       <defs>
+        <filter id="xglow" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
         <linearGradient id="gridGrad" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stop-color="#1a1a2e"/>
           <stop offset="100%" stop-color="#12121a"/>
@@ -750,25 +788,45 @@
       <text x="42" y="305" fill="#8888a0" text-anchor="middle" font-size="11">0</text>
       <text x="42" y="65" fill="#8888a0" text-anchor="middle" font-size="11">1</text>
 
-      <!-- Impossible line -->
+      <!-- Impossible line label -->
       <text x="210" y="15" fill="#ff6b6b" text-anchor="middle" font-size="11" opacity="0.8">Impossible de rassembler les 0 et les 1 avec une seule droite !</text>
 
-      <!-- Dashed attempt line -->
-      <line x1="60" y1="30" x2="360" y2="330" stroke="#ff6b6b" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.4"/>
-      <line x1="60" y1="330" x2="360" y2="30" stroke="#ff6b6b" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.4"/>
+      <!-- Animated dashed separator lines -->
+      <line x1="60" y1="30" x2="360" y2="330" stroke="#ff6b6b" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.4">
+        <animate attributeName="stroke-dashoffset" values="0;-20" dur="1.2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="60" y1="330" x2="360" y2="30" stroke="#ff6b6b" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.4">
+        <animate attributeName="stroke-dashoffset" values="0;-20" dur="1.2s" repeatCount="indefinite"/>
+      </line>
 
-      <!-- Points XOR=0 (rouge) -->
-      <circle cx="90" cy="300" r="18" fill="rgba(255,107,107,0.2)" stroke="#ff6b6b" stroke-width="2.5"/>
+      <!-- Points XOR=0 (rouge) — with pulse ring -->
+      <circle cx="90" cy="300" r="18" fill="none" stroke="#ff6b6b" stroke-width="1.5">
+        <animate attributeName="r" values="18;30;18" dur="3s" repeatCount="indefinite" begin="0s"/>
+        <animate attributeName="opacity" values="0.5;0;0.5" dur="3s" repeatCount="indefinite" begin="0s"/>
+      </circle>
+      <circle cx="90" cy="300" r="18" fill="rgba(255,107,107,0.2)" stroke="#ff6b6b" stroke-width="2.5" filter="url(#xglow)"/>
       <text x="90" y="305" fill="#ff6b6b" text-anchor="middle" font-size="13" font-weight="700">0</text>
 
-      <circle cx="330" cy="60" r="18" fill="rgba(255,107,107,0.2)" stroke="#ff6b6b" stroke-width="2.5"/>
+      <circle cx="330" cy="60" r="18" fill="none" stroke="#ff6b6b" stroke-width="1.5">
+        <animate attributeName="r" values="18;30;18" dur="3.4s" repeatCount="indefinite" begin="0.8s"/>
+        <animate attributeName="opacity" values="0.5;0;0.5" dur="3.4s" repeatCount="indefinite" begin="0.8s"/>
+      </circle>
+      <circle cx="330" cy="60" r="18" fill="rgba(255,107,107,0.2)" stroke="#ff6b6b" stroke-width="2.5" filter="url(#xglow)"/>
       <text x="330" y="65" fill="#ff6b6b" text-anchor="middle" font-size="13" font-weight="700">0</text>
 
-      <!-- Points XOR=1 (vert) -->
-      <circle cx="90" cy="60" r="18" fill="rgba(0,212,170,0.2)" stroke="#00d4aa" stroke-width="2.5"/>
+      <!-- Points XOR=1 (vert) — with pulse ring -->
+      <circle cx="90" cy="60" r="18" fill="none" stroke="#00d4aa" stroke-width="1.5">
+        <animate attributeName="r" values="18;30;18" dur="3.2s" repeatCount="indefinite" begin="0.4s"/>
+        <animate attributeName="opacity" values="0.5;0;0.5" dur="3.2s" repeatCount="indefinite" begin="0.4s"/>
+      </circle>
+      <circle cx="90" cy="60" r="18" fill="rgba(0,212,170,0.2)" stroke="#00d4aa" stroke-width="2.5" filter="url(#xglow)"/>
       <text x="90" y="65" fill="#00d4aa" text-anchor="middle" font-size="13" font-weight="700">1</text>
 
-      <circle cx="330" cy="300" r="18" fill="rgba(0,212,170,0.2)" stroke="#00d4aa" stroke-width="2.5"/>
+      <circle cx="330" cy="300" r="18" fill="none" stroke="#00d4aa" stroke-width="1.5">
+        <animate attributeName="r" values="18;30;18" dur="3.6s" repeatCount="indefinite" begin="1.2s"/>
+        <animate attributeName="opacity" values="0.5;0;0.5" dur="3.6s" repeatCount="indefinite" begin="1.2s"/>
+      </circle>
+      <circle cx="330" cy="300" r="18" fill="rgba(0,212,170,0.2)" stroke="#00d4aa" stroke-width="2.5" filter="url(#xglow)"/>
       <text x="330" y="305" fill="#00d4aa" text-anchor="middle" font-size="13" font-weight="700">1</text>
 
       <!-- Labels -->
@@ -830,27 +888,6 @@
   <!-- Cycle diagram -->
   <div class="figure reveal">
     <svg viewBox="0 0 600 250" xmlns="http://www.w3.org/2000/svg">
-      <!-- Boxes -->
-      <rect x="20" y="80" width="160" height="70" rx="12" fill="rgba(108,99,255,0.15)" stroke="#6c63ff" stroke-width="2"/>
-      <text x="100" y="110" fill="#6c63ff" text-anchor="middle" font-size="12" font-weight="600">FORWARD</text>
-      <text x="100" y="130" fill="#c8c8e0" text-anchor="middle" font-size="10">Prédiction</text>
-
-      <rect x="220" y="80" width="160" height="70" rx="12" fill="rgba(255,107,107,0.15)" stroke="#ff6b6b" stroke-width="2"/>
-      <text x="300" y="110" fill="#ff6b6b" text-anchor="middle" font-size="12" font-weight="600">LOSS</text>
-      <text x="300" y="130" fill="#c8c8e0" text-anchor="middle" font-size="10">Évaluation de l'erreur</text>
-
-      <rect x="420" y="80" width="160" height="70" rx="12" fill="rgba(0,212,170,0.15)" stroke="#00d4aa" stroke-width="2"/>
-      <text x="500" y="110" fill="#00d4aa" text-anchor="middle" font-size="12" font-weight="600">BACKWARD</text>
-      <text x="500" y="130" fill="#c8c8e0" text-anchor="middle" font-size="10">Auto-correction</text>
-
-      <!-- Arrows -->
-      <path d="M 180 115 L 215 115" stroke="#8888a0" stroke-width="2" marker-end="url(#arrowhead)"/>
-      <path d="M 380 115 L 415 115" stroke="#8888a0" stroke-width="2" marker-end="url(#arrowhead)"/>
-
-      <!-- Loop arrow -->
-      <path d="M 500 155 Q 500 210 300 215 Q 100 215 100 155" fill="none" stroke="#ffa500" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrowOrange)"/>
-      <text x="300" y="240" fill="#ffa500" text-anchor="middle" font-size="11" font-style="italic">Répété des milliers de fois</text>
-
       <defs>
         <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
           <polygon points="0 0, 8 3, 0 6" fill="#8888a0"/>
@@ -858,7 +895,77 @@
         <marker id="arrowOrange" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
           <polygon points="0 0, 8 3, 0 6" fill="#ffa500"/>
         </marker>
+        <filter id="c3glow" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <path id="c3pFwd"  d="M 100 115 L 300 115"/>
+        <path id="c3pLoss" d="M 300 115 L 500 115"/>
+        <path id="c3pLoop" d="M 500 155 Q 500 210 300 215 Q 100 215 100 155"/>
       </defs>
+
+      <!-- Boxes -->
+      <rect x="20" y="80" width="160" height="70" rx="12" fill="rgba(108,99,255,0.15)" stroke="#6c63ff" stroke-width="2"/>
+      <rect x="20" y="80" width="160" height="70" rx="12" fill="none" stroke="#6c63ff" stroke-width="4" opacity="0">
+        <animate attributeName="opacity" values="0;0.35;0" dur="2.5s" repeatCount="indefinite"/>
+      </rect>
+      <text x="100" y="110" fill="#6c63ff" text-anchor="middle" font-size="12" font-weight="600">FORWARD</text>
+      <text x="100" y="130" fill="#c8c8e0" text-anchor="middle" font-size="10">Prédiction</text>
+
+      <rect x="220" y="80" width="160" height="70" rx="12" fill="rgba(255,107,107,0.15)" stroke="#ff6b6b" stroke-width="2"/>
+      <rect x="220" y="80" width="160" height="70" rx="12" fill="none" stroke="#ff6b6b" stroke-width="4" opacity="0">
+        <animate attributeName="opacity" values="0;0.35;0" dur="2.5s" begin="0.83s" repeatCount="indefinite"/>
+      </rect>
+      <text x="300" y="110" fill="#ff6b6b" text-anchor="middle" font-size="12" font-weight="600">LOSS</text>
+      <text x="300" y="130" fill="#c8c8e0" text-anchor="middle" font-size="10">Évaluation de l'erreur</text>
+
+      <rect x="420" y="80" width="160" height="70" rx="12" fill="rgba(0,212,170,0.15)" stroke="#00d4aa" stroke-width="2"/>
+      <rect x="420" y="80" width="160" height="70" rx="12" fill="none" stroke="#00d4aa" stroke-width="4" opacity="0">
+        <animate attributeName="opacity" values="0;0.35;0" dur="2.5s" begin="1.66s" repeatCount="indefinite"/>
+      </rect>
+      <text x="500" y="110" fill="#00d4aa" text-anchor="middle" font-size="12" font-weight="600">BACKWARD</text>
+      <text x="500" y="130" fill="#c8c8e0" text-anchor="middle" font-size="10">Auto-correction</text>
+
+      <!-- Arrows -->
+      <path d="M 180 115 L 215 115" stroke="#8888a0" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <path d="M 380 115 L 415 115" stroke="#8888a0" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+      <!-- Loop arrow (animated dashes) -->
+      <path d="M 500 155 Q 500 210 300 215 Q 100 215 100 155" fill="none" stroke="#ffa500" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrowOrange)">
+        <animate attributeName="stroke-dashoffset" from="0" to="-100" dur="3s" repeatCount="indefinite"/>
+      </path>
+
+      <!-- Particles FORWARD→LOSS (purple) -->
+      <circle r="4.5" fill="#6c63ff" opacity="0" filter="url(#c3glow)">
+        <animateMotion dur="2s" repeatCount="indefinite" begin="0s"><mpath href="#c3pFwd"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="2s" repeatCount="indefinite" begin="0s"/>
+      </circle>
+      <circle r="4.5" fill="#6c63ff" opacity="0" filter="url(#c3glow)">
+        <animateMotion dur="2s" repeatCount="indefinite" begin="1s"><mpath href="#c3pFwd"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="2s" repeatCount="indefinite" begin="1s"/>
+      </circle>
+
+      <!-- Particles LOSS→BACKWARD (red) -->
+      <circle r="4.5" fill="#ff6b6b" opacity="0" filter="url(#c3glow)">
+        <animateMotion dur="2s" repeatCount="indefinite" begin="0.5s"><mpath href="#c3pLoss"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+      </circle>
+      <circle r="4.5" fill="#ff6b6b" opacity="0" filter="url(#c3glow)">
+        <animateMotion dur="2s" repeatCount="indefinite" begin="1.5s"><mpath href="#c3pLoss"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="2s" repeatCount="indefinite" begin="1.5s"/>
+      </circle>
+
+      <!-- Particles on loop arrow (orange) -->
+      <circle r="4.5" fill="#ffa500" opacity="0" filter="url(#c3glow)">
+        <animateMotion dur="3.5s" repeatCount="indefinite" begin="0s"><mpath href="#c3pLoop"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="3.5s" repeatCount="indefinite" begin="0s"/>
+      </circle>
+      <circle r="4.5" fill="#ffa500" opacity="0" filter="url(#c3glow)">
+        <animateMotion dur="3.5s" repeatCount="indefinite" begin="1.75s"><mpath href="#c3pLoop"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="3.5s" repeatCount="indefinite" begin="1.75s"/>
+      </circle>
+
+      <text x="300" y="240" fill="#ffa500" text-anchor="middle" font-size="11" font-style="italic">Répété des milliers de fois</text>
     </svg>
     <div class="figure-caption"><span class="fig-number">Figure 3</span><span class="fig-title">Le cycle d'apprentissage d'un réseau de neurones artificiel</span><span class="fig-note">Note. Les trois étapes — propagation avant, calcul de l'erreur et rétropropagation — sont répétées des milliers de fois jusqu'à convergence.</span></div>
   </div>
@@ -874,79 +981,184 @@
   <p class="reveal">Un neurone est une <strong>fonction mathématique à n variables</strong>. Il reçoit un nombre n d'entrées et produit une valeur en sortie. Par exemple, pour n = 3, les entrées peuvent être 2, 3 et 0.00001, et la sortie 42.</p>
 
   <p class="reveal">Un neurone possède les caractéristiques suivantes : pour chaque entrée \(x_n\), il possède un <strong>poids</strong> \(w_n\) qui lui est associé, ainsi qu'un <strong>biais</strong> \(b\) (un nombre stocké dans la « mémoire » du neurone).</p>
-  <p class="reveal"> Lorsque un neurone s'active (feedforward), il  <strong> multiplie la valeur de chacune de ses entrées avec chacun des poids associé à chaque entrée <strong>, et à la fin  <strong>additionne le biais. <strong> </p>
+  <p class="reveal"> Lorsque un neurone s'active (feedforward), il <strong>multiplie la valeur de chacune de ses entrées avec chacun des poids associé à chaque entrée</strong>, et à la fin <strong>additionne le biais.</strong></p>
+  <p class="reveal"> Enfin, la sortie du neurone passe dans une fonction appelée:<strong> Fonction d'activation (sigmoïde).</strong> C'est une fonction non linéaire qui prend un nombre en entrée et donne en sortie une valeur comprise entre 0 et 1.</p>  
 
   <!-- NEURONE DIAGRAM -->
   <div class="figure reveal">
-    <svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
       <defs>
-        <radialGradient id="neuronGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="rgba(108,99,255,0.3)"/>
-          <stop offset="100%" stop-color="transparent"/>
+        <!-- Glow filters -->
+        <filter id="n4fp" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="6" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="n4ft" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <!-- Gradients -->
+        <radialGradient id="n4rg1" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#6c63ff" stop-opacity="0.22"/>
+          <stop offset="100%" stop-color="#6c63ff" stop-opacity="0"/>
         </radialGradient>
-        <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stop-color="#6c63ff" stop-opacity="0.3"/>
-          <stop offset="100%" stop-color="#6c63ff"/>
+        <linearGradient id="n4lg1" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#6c63ff" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="#6c63ff" stop-opacity="0.9"/>
         </linearGradient>
-        <marker id="arr" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto">
-          <polygon points="0 0, 6 2.5, 0 5" fill="#6c63ff"/>
+        <linearGradient id="n4lg2" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#6c63ff"/>
+          <stop offset="100%" stop-color="#00d4aa"/>
+        </linearGradient>
+        <!-- Arrow markers -->
+        <marker id="n4ap" markerWidth="7" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 7 3, 0 6" fill="#6c63ff"/>
         </marker>
-        <marker id="arrOut" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto">
-          <polygon points="0 0, 6 2.5, 0 5" fill="#00d4aa"/>
+        <marker id="n4at" markerWidth="7" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 7 3, 0 6" fill="#00d4aa"/>
         </marker>
+        <!-- Motion paths for particles (identical to visual curves) -->
+        <path id="n4p1" d="M 93,90 C 230,120 340,195 388,237"/>
+        <path id="n4p2" d="M 93,200 C 230,212 340,230 388,247"/>
+        <path id="n4p3" d="M 93,310 C 230,295 340,272 390,258"/>
+        <path id="n4p4" d="M 93,420 C 230,375 340,315 393,268"/>
+        <path id="n4pO" d="M 516,250 L 655,250"/>
+        <path id="n4pF" d="M 769,250 L 858,250"/>
       </defs>
 
-      <!-- Input labels -->
-      <text x="30" y="75" fill="#c8c8e0" font-size="16" font-weight="500">x₁</text>
-      <text x="30" y="180" fill="#c8c8e0" font-size="16" font-weight="500">x₂</text>
-      <text x="30" y="290" fill="#c8c8e0" font-size="16" font-weight="500">xₙ</text>
+      <!-- Subtle grid background -->
+      <rect x="0" y="0" width="900" height="500" fill="#0c0c18" rx="10" opacity="0.55"/>
+      <g stroke="#6c63ff" stroke-width="0.5" opacity="0.06">
+        <line x1="150" y1="0" x2="150" y2="500"/><line x1="300" y1="0" x2="300" y2="500"/>
+        <line x1="450" y1="0" x2="450" y2="500"/><line x1="600" y1="0" x2="600" y2="500"/>
+        <line x1="750" y1="0" x2="750" y2="500"/>
+        <line x1="0" y1="125" x2="900" y2="125"/><line x1="0" y1="250" x2="900" y2="250"/>
+        <line x1="0" y1="375" x2="900" y2="375"/>
+      </g>
 
-      <!-- Dots for "..." -->
-      <circle cx="40" cy="220" r="2" fill="#8888a0"/>
-      <circle cx="40" cy="235" r="2" fill="#8888a0"/>
-      <circle cx="40" cy="250" r="2" fill="#8888a0"/>
+      <!-- ===== CONNECTION CURVES ===== -->
+      <path d="M 93,90 C 230,120 340,195 388,237"  stroke="url(#n4lg1)" stroke-width="1.8" fill="none" marker-end="url(#n4ap)" opacity="0.85"/>
+      <path d="M 93,200 C 230,212 340,230 388,247"  stroke="url(#n4lg1)" stroke-width="1.8" fill="none" marker-end="url(#n4ap)" opacity="0.85"/>
+      <path d="M 93,310 C 230,295 340,272 390,258"  stroke="url(#n4lg1)" stroke-width="1.8" fill="none" marker-end="url(#n4ap)" opacity="0.85"/>
+      <path d="M 93,420 C 230,375 340,315 393,268"  stroke="url(#n4lg1)" stroke-width="1.5" fill="none" marker-end="url(#n4ap)" opacity="0.50"/>
 
-      <!-- Connection lines with weights -->
-      <line x1="60" y1="70" x2="295" y2="165" stroke="url(#lineGrad)" stroke-width="2" marker-end="url(#arr)"/>
-      <line x1="60" y1="175" x2="295" y2="175" stroke="url(#lineGrad)" stroke-width="2" marker-end="url(#arr)"/>
-      <line x1="60" y1="285" x2="295" y2="185" stroke="url(#lineGrad)" stroke-width="2" marker-end="url(#arr)"/>
+      <!-- ===== ANIMATED PARTICLES ===== -->
+      <circle r="4.5" fill="#9d96ff" filter="url(#n4fp)"><animateMotion dur="1.9s" repeatCount="indefinite" begin="0s"><mpath href="#n4p1"/></animateMotion></circle>
+      <circle r="2.8" fill="#6c63ff" opacity="0.6"><animateMotion dur="1.9s" repeatCount="indefinite" begin="0.95s"><mpath href="#n4p1"/></animateMotion></circle>
+      <circle r="4.5" fill="#9d96ff" filter="url(#n4fp)"><animateMotion dur="2.2s" repeatCount="indefinite" begin="0.4s"><mpath href="#n4p2"/></animateMotion></circle>
+      <circle r="2.8" fill="#6c63ff" opacity="0.6"><animateMotion dur="2.2s" repeatCount="indefinite" begin="1.3s"><mpath href="#n4p2"/></animateMotion></circle>
+      <circle r="4.5" fill="#9d96ff" filter="url(#n4fp)"><animateMotion dur="2.0s" repeatCount="indefinite" begin="0.9s"><mpath href="#n4p3"/></animateMotion></circle>
+      <circle r="2.8" fill="#6c63ff" opacity="0.6"><animateMotion dur="2.0s" repeatCount="indefinite" begin="1.7s"><mpath href="#n4p3"/></animateMotion></circle>
+      <circle r="3.5" fill="#9d96ff" filter="url(#n4fp)" opacity="0.6"><animateMotion dur="2.4s" repeatCount="indefinite" begin="1.5s"><mpath href="#n4p4"/></animateMotion></circle>
 
-      <!-- Weight labels -->
-      <rect x="130" y="97" width="40" height="22" rx="4" fill="rgba(108,99,255,0.2)"/>
-      <text x="150" y="113" fill="#6c63ff" text-anchor="middle" font-size="12" font-weight="600">w₁</text>
+      <!-- ===== INPUT NODES ===== -->
+      <!-- x₁ -->
+      <circle cx="65" cy="90" r="28" fill="rgba(108,99,255,0.13)" stroke="#6c63ff" stroke-width="2"/>
+      <circle cx="65" cy="90" r="28" fill="none" stroke="#6c63ff" stroke-width="1.2">
+        <animate attributeName="r" values="28;46;28" dur="3.2s" repeatCount="indefinite" begin="0s"/>
+        <animate attributeName="opacity" values="0.6;0;0.6" dur="3.2s" repeatCount="indefinite" begin="0s"/>
+      </circle>
+      <text x="65" y="97" fill="#d0d0e8" text-anchor="middle" font-size="18" font-weight="600">x₁</text>
 
-      <rect x="145" y="158" width="40" height="22" rx="4" fill="rgba(108,99,255,0.2)"/>
-      <text x="165" y="174" fill="#6c63ff" text-anchor="middle" font-size="12" font-weight="600">w₂</text>
+      <!-- x₂ -->
+      <circle cx="65" cy="200" r="28" fill="rgba(108,99,255,0.13)" stroke="#6c63ff" stroke-width="2"/>
+      <circle cx="65" cy="200" r="28" fill="none" stroke="#6c63ff" stroke-width="1.2">
+        <animate attributeName="r" values="28;46;28" dur="3.7s" repeatCount="indefinite" begin="0.6s"/>
+        <animate attributeName="opacity" values="0.6;0;0.6" dur="3.7s" repeatCount="indefinite" begin="0.6s"/>
+      </circle>
+      <text x="65" y="207" fill="#d0d0e8" text-anchor="middle" font-size="18" font-weight="600">x₂</text>
 
-      <rect x="130" y="225" width="40" height="22" rx="4" fill="rgba(108,99,255,0.2)"/>
-      <text x="150" y="241" fill="#6c63ff" text-anchor="middle" font-size="12" font-weight="600">wₙ</text>
+      <!-- x₃ -->
+      <circle cx="65" cy="310" r="28" fill="rgba(108,99,255,0.13)" stroke="#6c63ff" stroke-width="2"/>
+      <circle cx="65" cy="310" r="28" fill="none" stroke="#6c63ff" stroke-width="1.2">
+        <animate attributeName="r" values="28;46;28" dur="4.1s" repeatCount="indefinite" begin="1.3s"/>
+        <animate attributeName="opacity" values="0.6;0;0.6" dur="4.1s" repeatCount="indefinite" begin="1.3s"/>
+      </circle>
+      <text x="65" y="317" fill="#d0d0e8" text-anchor="middle" font-size="18" font-weight="600">x₃</text>
 
-      <!-- Neuron body (glow + circle) -->
-      <circle cx="350" cy="175" r="60" fill="url(#neuronGlow)"/>
-      <circle cx="350" cy="175" r="45" fill="rgba(108,99,255,0.1)" stroke="#6c63ff" stroke-width="2.5">
-        <animate attributeName="r" values="45;47;45" dur="3s" repeatCount="indefinite"/>
+      <!-- Dots -->
+      <circle cx="65" cy="358" r="3.5" fill="#8888a0" opacity="0.55"/>
+      <circle cx="65" cy="374" r="3.5" fill="#8888a0" opacity="0.55"/>
+      <circle cx="65" cy="390" r="3.5" fill="#8888a0" opacity="0.55"/>
+
+      <!-- xₙ -->
+      <circle cx="65" cy="420" r="28" fill="rgba(108,99,255,0.07)" stroke="#6c63ff" stroke-width="1.5" opacity="0.55"/>
+      <text x="65" y="427" fill="#8888a0" text-anchor="middle" font-size="18" font-weight="600">xₙ</text>
+
+      <!-- ===== WEIGHT BADGES ===== -->
+      <rect x="196" y="127" width="52" height="26" rx="7" fill="rgba(108,99,255,0.28)" stroke="#6c63ff" stroke-width="1.2">
+        <animate attributeName="opacity" values="0.7;1;0.7" dur="2.2s" repeatCount="indefinite"/>
+      </rect>
+      <text x="222" y="145" fill="#c0b8ff" text-anchor="middle" font-size="14" font-weight="700">w₁</text>
+
+      <rect x="210" y="210" width="52" height="26" rx="7" fill="rgba(108,99,255,0.28)" stroke="#6c63ff" stroke-width="1.2">
+        <animate attributeName="opacity" values="0.7;1;0.7" dur="2.6s" repeatCount="indefinite" begin="0.35s"/>
+      </rect>
+      <text x="236" y="228" fill="#c0b8ff" text-anchor="middle" font-size="14" font-weight="700">w₂</text>
+
+      <rect x="212" y="274" width="52" height="26" rx="7" fill="rgba(108,99,255,0.28)" stroke="#6c63ff" stroke-width="1.2">
+        <animate attributeName="opacity" values="0.7;1;0.7" dur="2.9s" repeatCount="indefinite" begin="0.7s"/>
+      </rect>
+      <text x="238" y="292" fill="#c0b8ff" text-anchor="middle" font-size="14" font-weight="700">w₃</text>
+
+      <rect x="204" y="345" width="52" height="26" rx="7" fill="rgba(108,99,255,0.12)" stroke="#6c63ff" stroke-width="0.8" opacity="0.55"/>
+      <text x="230" y="363" fill="#8888a0" text-anchor="middle" font-size="14" font-weight="700">wₙ</text>
+
+      <!-- ===== NEURON BODY ===== -->
+      <!-- Outer halo (pulsing) -->
+      <circle cx="450" cy="250" r="118" fill="url(#n4rg1)">
+        <animate attributeName="r" values="112;135;112" dur="4s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.6;1;0.6" dur="4s" repeatCount="indefinite"/>
+      </circle>
+      <!-- Mid glow -->
+      <circle cx="450" cy="250" r="88" fill="rgba(108,99,255,0.07)">
+        <animate attributeName="r" values="84;95;84" dur="3.2s" repeatCount="indefinite"/>
+      </circle>
+      <!-- Main body -->
+      <circle cx="450" cy="250" r="62" fill="rgba(108,99,255,0.17)" stroke="#6c63ff" stroke-width="2.5" filter="url(#n4fp)">
+        <animate attributeName="r" values="60;65;60" dur="2.5s" repeatCount="indefinite"/>
+      </circle>
+      <!-- Inner dashed ring (slow rotation) -->
+      <circle cx="450" cy="250" r="52" fill="none" stroke="#6c63ff" stroke-width="0.9" stroke-dasharray="6 4" opacity="0.45">
+        <animateTransform attributeName="transform" type="rotate" from="0 450 250" to="360 450 250" dur="20s" repeatCount="indefinite"/>
+      </circle>
+      <!-- Fast scan arc (gradient color) -->
+      <circle cx="450" cy="250" r="68" fill="none" stroke="url(#n4lg2)" stroke-width="2.5" stroke-dasharray="50 377" opacity="0.9">
+        <animateTransform attributeName="transform" type="rotate" from="0 450 250" to="360 450 250" dur="2.6s" repeatCount="indefinite"/>
       </circle>
 
-      <!-- Sigma symbol in neuron -->
-      <text x="350" y="170" fill="#6c63ff" text-anchor="middle" font-size="28" font-weight="700">Σ</text>
-      <text x="350" y="195" fill="#8888a0" text-anchor="middle" font-size="10">+ b</text>
+      <!-- Σ symbol -->
+      <text x="450" y="242" fill="#c8c0ff" text-anchor="middle" font-size="44" font-weight="700" filter="url(#n4fp)">Σ</text>
+      <text x="450" y="274" fill="#8888a0" text-anchor="middle" font-size="13">+ b</text>
 
-      <!-- Output arrow -->
-      <line x1="400" y1="175" x2="530" y2="175" stroke="#00d4aa" stroke-width="2.5" marker-end="url(#arrOut)"/>
+      <!-- ===== OUTPUT LINE ===== -->
+      <line x1="514" y1="250" x2="653" y2="250" stroke="url(#n4lg2)" stroke-width="2.5" marker-end="url(#n4at)"/>
+      <!-- Output particles -->
+      <circle r="5" fill="#00d4aa" filter="url(#n4ft)"><animateMotion dur="1.4s" repeatCount="indefinite" begin="0.8s"><mpath href="#n4pO"/></animateMotion></circle>
+      <circle r="3" fill="#80ffe8" opacity="0.7"><animateMotion dur="1.4s" repeatCount="indefinite" begin="1.5s"><mpath href="#n4pO"/></animateMotion></circle>
 
-      <!-- Activation function box -->
-      <rect x="540" y="150" width="100" height="50" rx="10" fill="rgba(0,212,170,0.15)" stroke="#00d4aa" stroke-width="2"/>
-      <text x="590" y="172" fill="#00d4aa" text-anchor="middle" font-size="13" font-weight="600">σ(z)</text>
-      <text x="590" y="188" fill="#8888a0" text-anchor="middle" font-size="9">Activation</text>
+      <!-- ===== ACTIVATION BOX ===== -->
+      <rect x="665" y="218" width="102" height="64" rx="14" fill="rgba(0,212,170,0.13)" stroke="#00d4aa" stroke-width="2" filter="url(#n4ft)">
+        <animate attributeName="opacity" values="0.8;1;0.8" dur="2.4s" repeatCount="indefinite"/>
+      </rect>
+      <!-- Scanning bar -->
+      <rect x="667" y="220" width="96" height="4" rx="2" fill="#00d4aa" opacity="0">
+        <animate attributeName="y" values="220;278;220" dur="1.8s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0;0.28;0" dur="1.8s" repeatCount="indefinite"/>
+      </rect>
+      <text x="716" y="249" fill="#00d4aa" text-anchor="middle" font-size="22" font-weight="700">σ(z)</text>
+      <text x="716" y="270" fill="#8888a0" text-anchor="middle" font-size="11">Activation</text>
 
-      <!-- Final output -->
-      <line x1="640" y1="175" x2="690" y2="175" stroke="#00d4aa" stroke-width="2" marker-end="url(#arrOut)"/>
+      <!-- ===== FINAL OUTPUT ===== -->
+      <line x1="769" y1="250" x2="856" y2="250" stroke="#00d4aa" stroke-width="2.5" marker-end="url(#n4at)"/>
+      <text x="878" y="258" fill="#00d4aa" font-size="22" font-weight="700">ŷ</text>
+      <circle r="5" fill="#00d4aa" filter="url(#n4ft)"><animateMotion dur="1.0s" repeatCount="indefinite" begin="2.1s"><mpath href="#n4pF"/></animateMotion></circle>
 
-      <!-- Labels bottom -->
-      <text x="350" y="260" fill="#8888a0" text-anchor="middle" font-size="11">z = w₁x₁ + w₂x₂ + … + wₙxₙ + b</text>
+      <!-- ===== FORMULA ===== -->
+      <text x="450" y="445" fill="#6a6a90" text-anchor="middle" font-size="14" font-family="monospace">z = w₁x₁ + w₂x₂ + w₃x₃ + … + wₙxₙ + b</text>
 
-      <!-- Direction arrow -->
-      <text x="350" y="320" fill="#ffa500" text-anchor="middle" font-size="12" font-weight="600">→ Direction du signal : entrées → somme pondérée → activation → sortie</text>
+      <!-- ===== DIRECTION LABEL ===== -->
+      <text x="450" y="480" fill="#ffa500" text-anchor="middle" font-size="13" font-weight="600">→ Direction du signal : entrées → somme pondérée → activation → sortie</text>
     </svg>
     <div class="figure-caption"><span class="fig-number">Figure 4</span><span class="fig-title">Anatomie d'un neurone artificiel et direction du signal</span><span class="fig-note">Note. Les entrées (x) sont multipliées par leurs poids respectifs (w), sommées avec le biais (b), puis la sortie est transformée par une fonction d'activation σ. Adapté de Goodfellow et al. (2016).</span></div>
   </div>
@@ -993,6 +1205,24 @@
           <stop offset="0%" stop-color="rgba(255,165,0,0.4)"/>
           <stop offset="100%" stop-color="transparent"/>
         </radialGradient>
+        <marker id="arrDir" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#ffa500"/>
+        </marker>
+        <filter id="m5glow" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <!-- Motion paths for particles (input→hidden) -->
+        <path id="m5p11" d="M 145 140 L 310 120"/>
+        <path id="m5p12" d="M 145 140 L 310 200"/>
+        <path id="m5p13" d="M 145 140 L 310 280"/>
+        <path id="m5p21" d="M 145 260 L 310 120"/>
+        <path id="m5p22" d="M 145 260 L 310 200"/>
+        <path id="m5p23" d="M 145 260 L 310 280"/>
+        <!-- Motion paths for particles (hidden→output) -->
+        <path id="m5p31" d="M 440 120 L 575 200"/>
+        <path id="m5p32" d="M 440 200 L 575 200"/>
+        <path id="m5p33" d="M 440 280 L 575 200"/>
       </defs>
 
       <!-- Layer labels -->
@@ -1000,12 +1230,10 @@
       <text x="375" y="35" fill="#00d4aa" text-anchor="middle" font-size="13" font-weight="600">Couche cachée</text>
       <text x="640" y="35" fill="#ffa500" text-anchor="middle" font-size="13" font-weight="600">Couche de sortie</text>
 
-      <!-- Connection lines (all to all) Input -> Hidden -->
-      <!-- Input 1 to Hidden -->
+      <!-- Connection lines Input -> Hidden -->
       <line x1="145" y1="140" x2="310" y2="120" stroke="#6c63ff" stroke-width="1" opacity="0.3"/>
       <line x1="145" y1="140" x2="310" y2="200" stroke="#6c63ff" stroke-width="1" opacity="0.3"/>
       <line x1="145" y1="140" x2="310" y2="280" stroke="#6c63ff" stroke-width="1" opacity="0.3"/>
-      <!-- Input 2 to Hidden -->
       <line x1="145" y1="260" x2="310" y2="120" stroke="#6c63ff" stroke-width="1" opacity="0.3"/>
       <line x1="145" y1="260" x2="310" y2="200" stroke="#6c63ff" stroke-width="1" opacity="0.3"/>
       <line x1="145" y1="260" x2="310" y2="280" stroke="#6c63ff" stroke-width="1" opacity="0.3"/>
@@ -1016,28 +1244,52 @@
       <line x1="440" y1="280" x2="575" y2="200" stroke="#00d4aa" stroke-width="1" opacity="0.3"/>
 
       <!-- INPUT NEURONS -->
+      <circle cx="110" cy="140" r="28" fill="none" stroke="#6c63ff" stroke-width="1.5" opacity="0">
+        <animate attributeName="r" from="28" to="55" dur="2.2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" from="0.5" to="0" dur="2.2s" repeatCount="indefinite"/>
+      </circle>
       <circle cx="110" cy="140" r="30" fill="url(#nGlow1)"/>
       <circle cx="110" cy="140" r="25" fill="rgba(108,99,255,0.1)" stroke="#6c63ff" stroke-width="2"/>
       <text x="110" y="145" fill="#6c63ff" text-anchor="middle" font-size="14" font-weight="600">x₁</text>
 
+      <circle cx="110" cy="260" r="28" fill="none" stroke="#6c63ff" stroke-width="1.5" opacity="0">
+        <animate attributeName="r" from="28" to="55" dur="2.2s" begin="0.5s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" from="0.5" to="0" dur="2.2s" begin="0.5s" repeatCount="indefinite"/>
+      </circle>
       <circle cx="110" cy="260" r="30" fill="url(#nGlow1)"/>
       <circle cx="110" cy="260" r="25" fill="rgba(108,99,255,0.1)" stroke="#6c63ff" stroke-width="2"/>
       <text x="110" y="265" fill="#6c63ff" text-anchor="middle" font-size="14" font-weight="600">x₂</text>
 
       <!-- HIDDEN NEURONS -->
+      <circle cx="375" cy="120" r="28" fill="none" stroke="#00d4aa" stroke-width="1.5" opacity="0">
+        <animate attributeName="r" from="28" to="55" dur="2.4s" begin="0.3s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" from="0.5" to="0" dur="2.4s" begin="0.3s" repeatCount="indefinite"/>
+      </circle>
       <circle cx="375" cy="120" r="30" fill="url(#nGlow2)"/>
       <circle cx="375" cy="120" r="25" fill="rgba(0,212,170,0.1)" stroke="#00d4aa" stroke-width="2"/>
       <text x="375" y="125" fill="#00d4aa" text-anchor="middle" font-size="14" font-weight="600">h₁</text>
 
+      <circle cx="375" cy="200" r="28" fill="none" stroke="#00d4aa" stroke-width="1.5" opacity="0">
+        <animate attributeName="r" from="28" to="55" dur="2.4s" begin="0.8s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" from="0.5" to="0" dur="2.4s" begin="0.8s" repeatCount="indefinite"/>
+      </circle>
       <circle cx="375" cy="200" r="30" fill="url(#nGlow2)"/>
       <circle cx="375" cy="200" r="25" fill="rgba(0,212,170,0.1)" stroke="#00d4aa" stroke-width="2"/>
       <text x="375" y="205" fill="#00d4aa" text-anchor="middle" font-size="14" font-weight="600">h₂</text>
 
+      <circle cx="375" cy="280" r="28" fill="none" stroke="#00d4aa" stroke-width="1.5" opacity="0">
+        <animate attributeName="r" from="28" to="55" dur="2.4s" begin="1.3s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" from="0.5" to="0" dur="2.4s" begin="1.3s" repeatCount="indefinite"/>
+      </circle>
       <circle cx="375" cy="280" r="30" fill="url(#nGlow2)"/>
       <circle cx="375" cy="280" r="25" fill="rgba(0,212,170,0.1)" stroke="#00d4aa" stroke-width="2"/>
       <text x="375" y="285" fill="#00d4aa" text-anchor="middle" font-size="14" font-weight="600">h₃</text>
 
       <!-- OUTPUT NEURON -->
+      <circle cx="640" cy="200" r="28" fill="none" stroke="#ffa500" stroke-width="1.5" opacity="0">
+        <animate attributeName="r" from="28" to="55" dur="2s" begin="0.6s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" from="0.5" to="0" dur="2s" begin="0.6s" repeatCount="indefinite"/>
+      </circle>
       <circle cx="640" cy="200" r="30" fill="url(#nGlow3)"/>
       <circle cx="640" cy="200" r="25" fill="rgba(255,165,0,0.1)" stroke="#ffa500" stroke-width="2"/>
       <text x="640" y="205" fill="#ffa500" text-anchor="middle" font-size="14" font-weight="600">ŷ</text>
@@ -1048,14 +1300,49 @@
       <text x="505" y="155" fill="#8888a0" text-anchor="middle" font-size="10">w'₁</text>
       <text x="505" y="200" fill="#8888a0" text-anchor="middle" font-size="10">w'₂</text>
 
+      <!-- Particles Input→Hidden (purple, staggered) -->
+      <circle r="4" fill="#6c63ff" opacity="0" filter="url(#m5glow)">
+        <animateMotion dur="1.5s" repeatCount="indefinite" begin="0s"><mpath href="#m5p11"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="1.5s" repeatCount="indefinite" begin="0s"/>
+      </circle>
+      <circle r="4" fill="#6c63ff" opacity="0" filter="url(#m5glow)">
+        <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.25s"><mpath href="#m5p12"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="1.5s" repeatCount="indefinite" begin="0.25s"/>
+      </circle>
+      <circle r="4" fill="#6c63ff" opacity="0" filter="url(#m5glow)">
+        <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.5s"><mpath href="#m5p13"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="1.5s" repeatCount="indefinite" begin="0.5s"/>
+      </circle>
+      <circle r="4" fill="#6c63ff" opacity="0" filter="url(#m5glow)">
+        <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.75s"><mpath href="#m5p21"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="1.5s" repeatCount="indefinite" begin="0.75s"/>
+      </circle>
+      <circle r="4" fill="#6c63ff" opacity="0" filter="url(#m5glow)">
+        <animateMotion dur="1.5s" repeatCount="indefinite" begin="1.0s"><mpath href="#m5p22"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="1.5s" repeatCount="indefinite" begin="1.0s"/>
+      </circle>
+      <circle r="4" fill="#6c63ff" opacity="0" filter="url(#m5glow)">
+        <animateMotion dur="1.5s" repeatCount="indefinite" begin="1.25s"><mpath href="#m5p23"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="1.5s" repeatCount="indefinite" begin="1.25s"/>
+      </circle>
+
+      <!-- Particles Hidden→Output (teal, staggered) -->
+      <circle r="4" fill="#00d4aa" opacity="0" filter="url(#m5glow)">
+        <animateMotion dur="1.2s" repeatCount="indefinite" begin="0s"><mpath href="#m5p31"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="1.2s" repeatCount="indefinite" begin="0s"/>
+      </circle>
+      <circle r="4" fill="#00d4aa" opacity="0" filter="url(#m5glow)">
+        <animateMotion dur="1.2s" repeatCount="indefinite" begin="0.4s"><mpath href="#m5p32"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="1.2s" repeatCount="indefinite" begin="0.4s"/>
+      </circle>
+      <circle r="4" fill="#00d4aa" opacity="0" filter="url(#m5glow)">
+        <animateMotion dur="1.2s" repeatCount="indefinite" begin="0.8s"><mpath href="#m5p33"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="1.2s" repeatCount="indefinite" begin="0.8s"/>
+      </circle>
+
       <!-- Direction arrow -->
       <line x1="50" y1="370" x2="700" y2="370" stroke="#ffa500" stroke-width="1.5" marker-end="url(#arrDir)" opacity="0.6"/>
       <text x="375" y="395" fill="#ffa500" text-anchor="middle" font-size="11">Direction de la propagation (feedforward)</text>
-      <defs>
-        <marker id="arrDir" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-          <polygon points="0 0, 8 3, 0 6" fill="#ffa500"/>
-        </marker>
-      </defs>
     </svg>
     <div class="figure-caption"><span class="fig-number">Figure 5</span><span class="fig-title">Architecture d'un perceptron multicouche (MLP) pour la résolution du problème XOR</span><span class="fig-note">Note. Le réseau comporte une couche d'entrée (2 neurones), une couche cachée (3 neurones pour l'illustration) et une couche de sortie (1 neurone). Les connexions représentent les poids synaptiques.</span></div>
   </div>
@@ -1118,7 +1405,7 @@
 
   <h3 class="reveal">La fonction Sigmoïde</h3>
 
-  <p class="reveal">Dans notre cas, nous allons utiliser la fonction <strong>Sigmoïde</strong> car elle se dérive facilement (vous verrez plus tard pourquoi c'est utile) et donne en sortie une valeur entre 0 et 1. Le format et ordre de grandeur arfait pour un calcul de probabilité ! (une probabilité est toujours comprise entre 0 et 1) </p>
+  <p class="reveal">Dans notre cas, nous allons utiliser la fonction <strong>Sigmoïde</strong> car elle se dérive facilement (vous verrez plus tard pourquoi c'est utile) et donne en sortie une valeur entre 0 et 1. Le format et ordre de grandeur parfait pour un calcul de probabilité ! (une probabilité est toujours comprise entre 0 et 1) </p>
 
   <div class="formula-box reveal">
     <p style="margin:0; font-size:0.9rem; color:var(--text-dim); margin-bottom:0.5rem;">Fonction Sigmoïde et sa dérivée</p>
@@ -1128,7 +1415,7 @@
   <!-- SIGMOID GRAPH (canvas) -->
   <div class="chart-container reveal">
     <canvas id="sigmoidChart" width="800" height="380"></canvas>
-    <div class="figure-caption" style="margin-top:1rem;"><span class="fig-number">Figure 6</span><span class="fig-title">Graphique de la fonction sigmoïde σ(z) et de sa dérivée σ'(z)</span><span class="fig-note">Note. La sigmoïde compresse toute valeur réelle dans l'intervalle [0, 1]. Sa dérivée atteint un maximum de 0,25 en z = 0, ce qui explique le phénomène de vanishing gradient pour les valeurs extrêmes.</span></div>
+    <div class="figure-caption" style="margin-top:1rem;"><span class="fig-number">Figure 6</span><span class="fig-title">Graphique de la fonction sigmoïde σ(z)</span></div>
   </div>
 
   <div class="code-block reveal">
@@ -1161,7 +1448,7 @@
   <p class="reveal">Par exemple, si on entraîne une IA qui doit prédire le nombre de boîtes de LEGO vendues à Chicago l'année prochaine, nous avons besoin des données de ventes des dernières années. Plus nous aurons de données pertinentes, plus notre modèle pourra apprendre et ajuster ses paramètres pour devenir performant.</p>
 
   <div class="card card-warning reveal">
-    <p style="margin:0;"><strong>Le nerf de la guerre :</strong> Dans le monde de l'intelligence artificielle, ce qui compte le plus, c'est la <em>donnée</em> et l'<em>énergie</em>. Sans données, pas d'entraînement. Sans entraînement, pas d'apprentissage. Sans apprentissage, pas de résultats.</p>
+    <p style="margin:0;"> Dans le monde de l'intelligence artificielle, l'une des ressources les plus cruciales, ce sont les <strong><em>données</em></strong>. Sans données, pas d'entraînement. Sans entraînement, pas d'apprentissage. Sans apprentissage, pas de résultats.</p>
   </div>
 
   <p class="reveal">Pour évaluer notre réseau, on calcule l'écart entre la réponse attendue et la prédiction. Plus l'écart est faible, meilleure est la prédiction. C'est à ça que sert la <strong>Loss Function</strong> (fonction de perte). Nous utilisons l'<strong>Erreur Quadratique Moyenne (MSE)</strong>.</p>
@@ -1233,7 +1520,7 @@
   </div>
 
   <p class="reveal">La dérivée partielle de la Loss par rapport à un paramètre nous dit : <em>à quel point la Loss (la qualité de notre prédiction) va varier si je fais varier ce paramètre ?</em> Nous saurons alors dans quel « sens » modifier nos paramètres pour réduire notre MSE.</p>
-  <p class="reveal">En appliquant la règle de la dérivée en chaine, on calculs les gradients de chaques couches en multipliant le gradient d'entrée par le vecteur X des entrées de la couche .</p>
+  <p class="reveal">En appliquant la règle de la dérivée en chaîne, on calcule les gradients de chaque couche en multipliant le gradient d'entrée par le vecteur X des entrées de la couche.</p>
 
   <div class="formula-box reveal">
     <p style="margin:0; font-size:0.9rem; color:var(--text-dim); margin-bottom:0.5rem;">La règle de la chaîne (Chain Rule)</p>
@@ -1250,6 +1537,12 @@
         <marker id="arrForw" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
           <polygon points="0 0, 8 3, 0 6" fill="#6c63ff"/>
         </marker>
+        <filter id="b8glow" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <path id="b8pFwd"  d="M 30 80 L 630 80"/>
+        <path id="b8pBack" d="M 630 220 L 30 220"/>
       </defs>
 
       <!-- Forward pass (top) -->
@@ -1277,6 +1570,20 @@
       <line x1="310" y1="80" x2="345" y2="80" stroke="#6c63ff" stroke-width="1.5" marker-end="url(#arrForw)"/>
       <line x1="470" y1="80" x2="505" y2="80" stroke="#6c63ff" stroke-width="1.5" marker-end="url(#arrForw)"/>
 
+      <!-- Forward particles (blue, L→R) -->
+      <circle r="4" fill="#6c63ff" opacity="0" filter="url(#b8glow)">
+        <animateMotion dur="3s" repeatCount="indefinite" begin="0s"><mpath href="#b8pFwd"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.03;0.97;1" dur="3s" repeatCount="indefinite" begin="0s"/>
+      </circle>
+      <circle r="4" fill="#6c63ff" opacity="0" filter="url(#b8glow)">
+        <animateMotion dur="3s" repeatCount="indefinite" begin="1s"><mpath href="#b8pFwd"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.03;0.97;1" dur="3s" repeatCount="indefinite" begin="1s"/>
+      </circle>
+      <circle r="4" fill="#6c63ff" opacity="0" filter="url(#b8glow)">
+        <animateMotion dur="3s" repeatCount="indefinite" begin="2s"><mpath href="#b8pFwd"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.03;0.97;1" dur="3s" repeatCount="indefinite" begin="2s"/>
+      </circle>
+
       <!-- Backward pass (bottom) -->
       <text x="350" y="170" fill="#ff6b6b" text-anchor="middle" font-size="13" font-weight="600">← Backward pass (correction des poids)</text>
 
@@ -1301,6 +1608,20 @@
       <line x1="505" y1="220" x2="475" y2="220" stroke="#ff6b6b" stroke-width="1.5" marker-end="url(#arrBack)"/>
       <line x1="345" y1="220" x2="315" y2="220" stroke="#ff6b6b" stroke-width="1.5" marker-end="url(#arrBack)"/>
       <line x1="185" y1="220" x2="155" y2="220" stroke="#ff6b6b" stroke-width="1.5" marker-end="url(#arrBack)"/>
+
+      <!-- Backward particles (red, R→L) -->
+      <circle r="4" fill="#ff6b6b" opacity="0" filter="url(#b8glow)">
+        <animateMotion dur="3s" repeatCount="indefinite" begin="0s"><mpath href="#b8pBack"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.03;0.97;1" dur="3s" repeatCount="indefinite" begin="0s"/>
+      </circle>
+      <circle r="4" fill="#ff6b6b" opacity="0" filter="url(#b8glow)">
+        <animateMotion dur="3s" repeatCount="indefinite" begin="1s"><mpath href="#b8pBack"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.03;0.97;1" dur="3s" repeatCount="indefinite" begin="1s"/>
+      </circle>
+      <circle r="4" fill="#ff6b6b" opacity="0" filter="url(#b8glow)">
+        <animateMotion dur="3s" repeatCount="indefinite" begin="2s"><mpath href="#b8pBack"/></animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.03;0.97;1" dur="3s" repeatCount="indefinite" begin="2s"/>
+      </circle>
     </svg>
     <div class="figure-caption"><span class="fig-number">Figure 8</span><span class="fig-title">Schéma comparatif de la propagation avant (forward) et de la rétropropagation (backward)</span><span class="fig-note">Note. Le forward pass calcule la prédiction de gauche à droite, tandis que le backward pass remonte les gradients de droite à gauche pour corriger les poids. Adapté de Rumelhart et al. (1986).</span></div>
   </div>
@@ -1587,21 +1908,6 @@ function drawSigmoid() {
   // Sigmoid function
   function sigmoid(z) { return 1 / (1 + Math.exp(-z)); }
 
-  // Draw derivative first (behind)
-  ctx.beginPath();
-  ctx.strokeStyle = 'rgba(255,107,107,0.6)';
-  ctx.lineWidth = 2;
-  for (let i = 0; i <= plotW; i++) {
-    const z = (i / plotW) * 16 - 8;
-    const s = sigmoid(z);
-    const ds = s * (1 - s);
-    const x = pad.left + i;
-    const y = pad.top + plotH * (1 - ds);
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  }
-  ctx.stroke();
-
   // Draw sigmoid curve
   ctx.beginPath();
   const gradient = ctx.createLinearGradient(pad.left, 0, W - pad.right, 0);
@@ -1642,16 +1948,6 @@ function drawSigmoid() {
   ctx.fillStyle = '#c8c8e0';
   ctx.textAlign = 'left';
   ctx.fillText('σ(z) = 1 / (1 + e⁻ᶻ)', W - 185, 24);
-
-  // Derivative
-  ctx.strokeStyle = 'rgba(255,107,107,0.6)';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(W - 220, 42);
-  ctx.lineTo(W - 190, 42);
-  ctx.stroke();
-  ctx.fillStyle = '#ff6b6b';
-  ctx.fillText("σ'(z) = σ(z)·(1−σ(z))", W - 185, 46);
 
   // Title
   ctx.fillStyle = '#e8e8f0';
