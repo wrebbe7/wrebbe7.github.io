@@ -967,7 +967,7 @@
 
       <text x="300" y="240" fill="#ffa500" text-anchor="middle" font-size="11" font-style="italic">Répété des milliers de fois</text>
     </svg>
-    <div class="figure-caption"><span class="fig-number">Figure 3</span><span class="fig-title">Le cycle d'apprentissage d'un réseau de neurones artificiel</span><span class="fig-note">Note. Les trois étapes — propagation avant, calcul de l'erreur et rétropropagation — sont répétées des milliers de fois jusqu'à convergence.</span></div>
+    <div class="figure-caption"><span class="fig-number">Figure 3</span><span class="fig-title">Le cycle d'apprentissage d'un réseau de neurones artificiel</span><span class="fig-note">Note. Les trois étapes: propagation avant, calcul de l'erreur et rétropropagation, sont répétées des milliers de fois jusqu'à ce que l'erreur soit faible.</span></div>
   </div>
 </section>
 
@@ -1448,7 +1448,7 @@
   <p class="reveal">Par exemple, si on entraîne une IA qui doit prédire le nombre de boîtes de LEGO vendues à Chicago l'année prochaine, nous avons besoin des données de ventes des dernières années. Plus nous aurons de données pertinentes, plus notre modèle pourra apprendre et ajuster ses paramètres pour devenir performant.</p>
 
   <div class="card card-warning reveal">
-    <p style="margin:0;"> Dans le monde de l'intelligence artificielle, l'une des ressources les plus cruciales, ce sont les <strong><em>données</em></strong>. Sans données, pas d'entraînement. Sans entraînement, pas d'apprentissage. Sans apprentissage, pas de résultats.</p>
+    <p style="margin:0;"> Dans le monde de l'intelligence artificielle, l'une des ressources les plus cruciales sont les <strong><em>données</em></strong>. Sans données, pas d'entraînement. Sans entraînement, pas d'apprentissage. Sans apprentissage, pas de résultats.</p>
   </div>
 
   <p class="reveal">Pour évaluer notre réseau, on calcule l'écart entre la réponse attendue et la prédiction. Plus l'écart est faible, meilleure est la prédiction. C'est à ça que sert la <strong>Loss Function</strong> (fonction de perte). Nous utilisons l'<strong>Erreur Quadratique Moyenne (MSE)</strong>.</p>
@@ -1516,11 +1516,12 @@
   <p class="reveal">Ce qui fait la spécificité et la performance d'un réseau de neurones, ce sont ses paramètres. C'est en modifiant soigneusement les valeurs des paramètres qu'on améliore un RNA. Certains RNA contiennent des millions, voire des milliards de paramètres. Pour savoir lesquels ajuster et de combien, nous utilisons un outil créé par Isaac Newton : <strong>le calcul différentiel</strong>.</p>
 
   <div class="card reveal">
-    <p><strong>Rappel :</strong> La dérivée partielle d'une fonction par rapport à une de ses variables nous apprend <em>à quel point la fonction va varier si on fait varier cette variable</em>. Pour schématiser : en étudiant une heure de plus pour mon contrôle, est-ce que ma moyenne va augmenter de 1 %, de 5 %, ou de 0 % ?</p>
+    <p><strong>Rappel :</strong> La dérivée partielle d'une fonction par rapport à une de ses variables nous apprend <em>à quel point la fonction va varier si on fait varier cette variable</em>. Pour schématiser : en étudiant une heure de plus pour mon contrôle, est-ce que ma moyenne va augmenter de 1 %, de 5 %, ou de 0 % ? va elle diminuer à cause de la fatigue engendrée ? </p>
   </div>
 
   <p class="reveal">La dérivée partielle de la Loss par rapport à un paramètre nous dit : <em>à quel point la Loss (la qualité de notre prédiction) va varier si je fais varier ce paramètre ?</em> Nous saurons alors dans quel « sens » modifier nos paramètres pour réduire notre MSE.</p>
   <p class="reveal">En appliquant la règle de la dérivée en chaîne, on calcule les gradients de chaque couche en multipliant le gradient d'entrée par le vecteur X des entrées de la couche.</p>
+  <p class="reveal">Le <strong>Learning rate (lr), </strong>ou taux d'apprentissage, est une constante qu'on va fixer à l'avance. Elle définit la vitesse à laquelle notre réseau va s'actualiser.</p>
 
   <div class="formula-box reveal">
     <p style="margin:0; font-size:0.9rem; color:var(--text-dim); margin-bottom:0.5rem;">La règle de la chaîne (Chain Rule)</p>
@@ -1778,7 +1779,7 @@ proba, binary = trainer.predict(X)
   </table>
 
   <div class="card card-success reveal">
-    <p style="margin:0;"><strong>Le réseau a appris la fonction XOR !</strong> En partant de poids aléatoires, après 6 000 itérations de forward → loss → backward → update, notre MLP produit des prédictions proches de 0 et 1 avec une marge d'erreur inférieure à 3 %. Le problème qui a failli tuer l'IA est résolu par une couche cachée et une fonction d'activation non linéaire.</p>
+    <p style="margin:0;"><strong>Le réseau a appris la fonction XOR !</strong> En partant de poids aléatoires, après 6 000 itérations de forward → loss → backward → update, notre MLP produit des prédictions proches de 0 et 1 avec une marge d'erreur inférieure à 3 %. Notre réseau est donc bien capable d'approximer une fonction non linéaire, dans ce cas ci la fonction XOR !</p>
   </div>
 
   <!-- Loss curve chart -->
